@@ -29,6 +29,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.environ['DEBUG']))
+SERVER = bool(int(os.environ['SERVER']))
 
 ALLOWED_HOSTS = []
 
@@ -229,7 +230,7 @@ CORS_ALLOW_HEADERS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-if DEBUG:
+if DEBUG or not SERVER:
     STATICFILES_DIRS = (
          os.path.join(BASE_DIR, 'static'),
     )
