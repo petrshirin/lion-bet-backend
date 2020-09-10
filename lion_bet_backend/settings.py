@@ -230,7 +230,7 @@ CORS_ALLOW_HEADERS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-if DEBUG or not SERVER:
+if DEBUG and not SERVER:
     STATICFILES_DIRS = (
          os.path.join(BASE_DIR, 'static'),
     )
