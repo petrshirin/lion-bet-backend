@@ -56,7 +56,11 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'users',
     'lion_bet.apps.LionBetConfig',
-    'techsupport'
+    'techsupport',
+    'djkombu',
+    'sport_events',
+    'django_celery_results',
+    'django_celery_beat'
 
 ]
 
@@ -224,6 +228,11 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 
 ]
+
+
+# Celery
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
 
 
 # Static files
