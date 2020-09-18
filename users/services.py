@@ -31,7 +31,7 @@ def register_client(request: Request) -> Dict:
     try:
         check_password(request.data.get('password1'), request.data.get('password2'))
     except ValueError as err:
-        return {'errors': err, 'success': False}
+        return {'errors': str(err), 'success': False}
 
     try:
         check_user_from_db(request.data.get('username'), request.data.get('email'))
