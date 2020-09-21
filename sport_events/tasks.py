@@ -3,6 +3,11 @@ from celery.schedules import crontab
 from .betapi_wrapper import SportWrapper, CountryWrapper, TournamentWrapper, MatchWrapper
 from celery import Celery
 from lion_bet_backend.celery import app
+import logging
+
+
+LOG = logging.getLogger(__name__)
+
 
 app.conf.beat_schedule = {
     "update_sports_line": {
@@ -26,28 +31,45 @@ app.conf.beat_schedule = {
 
 
 @app.task
-def update_sports_line():
+def update_sports():
     sport_api = SportWrapper()
     sport_api.save_items_to_db()
+    LOG.info('update sports completed')
 
 
 @app.task
-def update_countries_line():
+def update_countries():
     country_api = CountryWrapper()
     country_api.save_items_to_db()
+    LOG.info('update countries completed')
 
 
 @app.task
 def update_tournaments_line():
     tournament_api = TournamentWrapper()
     tournament_api.save_items_to_db()
+    LOG.info('update line tournaments completed')
 
 
 @app.task
 def update_matches_line():
     matches_api = MatchWrapper()
     matches_api.save_items_to_db()
-    print('update_matches_line completed')
+    LOG.info('update line matches completed')
+
+
+@app.task
+def update_tournaments_live():
+    tournament_api = TournamentWrapper()
+    tournament_api.save_items_to_db()
+    LOG.info('update live tournaments completed')
+
+
+@app.task
+def update_matches_live():
+    matches_api = MatchWrapper()
+    matches_api.save_items_to_db()
+    LOG.info('update live matches completed')
 
 
 
