@@ -47,6 +47,7 @@ def update_countries():
 @app.task
 def update_tournaments_line():
     tournament_api = TournamentWrapper()
+    tournament_api.delete_all_from_db()
     tournament_api.save_items_to_db()
     LOG.info('update line tournaments completed')
 
@@ -54,6 +55,7 @@ def update_tournaments_line():
 @app.task
 def update_matches_line():
     matches_api = MatchWrapper()
+    matches_api.delete_all_from_db()
     matches_api.save_items_to_db()
     LOG.info('update line matches completed')
 
@@ -61,6 +63,7 @@ def update_matches_line():
 @app.task
 def update_tournaments_live():
     tournament_api = TournamentWrapper('live')
+    tournament_api.delete_all_from_db()
     tournament_api.save_items_to_db()
     LOG.info('update live tournaments completed')
 
@@ -68,6 +71,7 @@ def update_tournaments_live():
 @app.task
 def update_matches_live():
     matches_api = MatchWrapper('live')
+    matches_api.delete_all_from_db()
     matches_api.save_items_to_db()
     LOG.info('update live matches completed')
 
