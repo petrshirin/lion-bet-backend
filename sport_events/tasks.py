@@ -60,14 +60,14 @@ def update_matches_line():
 
 @app.task
 def update_tournaments_live():
-    tournament_api = TournamentWrapper()
+    tournament_api = TournamentWrapper('live')
     tournament_api.save_items_to_db()
     LOG.info('update live tournaments completed')
 
 
 @app.task
 def update_matches_live():
-    matches_api = MatchWrapper()
+    matches_api = MatchWrapper('live')
     matches_api.save_items_to_db()
     LOG.info('update live matches completed')
 
