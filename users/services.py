@@ -67,10 +67,13 @@ def change_password(request: Request) -> Dict:
     ser = ChangePasswordSerializer(data=request.data)
     if ser.is_valid():
         try:
+            if not request.user.check_password(ser.validated_data['old_password']):
+                return {'errors': "old password is not correct", 'success': False}
             check_password(ser.validated_data['password1'], ser.validated_data['password2'])
         except ValueError as err:
             return {'errors': str(err), 'success': False}
         request.user.set_password(ser.validated_data['password1'])
+        request.user.save()
         return {'data': 'ok', 'success': True}
     else:
         return {'errors': ser.errors, 'success': False}
@@ -87,7 +90,7 @@ def change_client_info(request: Request) -> Dict:
         ser.update(request.user.client, validated_data=ser.validated_data)
         return {'data': 'ok', 'success': True}
     else:
-        return {'errors': ser.errors, 'success': True}
+        return {'errors': ser.errors, 'success': False}
 
 
 def check_user_from_db(username: str, email: str) -> bool:
