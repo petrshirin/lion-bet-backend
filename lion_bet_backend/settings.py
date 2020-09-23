@@ -239,6 +239,11 @@ CELERY_CACHE_BACKEND = 'django-cache'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
+
+# betAPI
+BET_API_HOST = 'https://odds.incub.space'
+BET_API_SECRET_KEY = os.environ.get('BET_API_SECRET_KEY')
+
 if DEBUG and not SERVER:
     STATICFILES_DIRS = (
          os.path.join(BASE_DIR, 'static'),

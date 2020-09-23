@@ -2,12 +2,14 @@ import requests
 from .models import *
 from django.db.models.query import QuerySet
 from typing import Union, Dict, Any
-from django.db.utils import IntegrityError
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import logging
+from django.conf import settings
 
-BASE_PATH = 'https://odds.incub.space'
-API_SECRET_KEY = 'Test_7_Iskander_ekf3kfkdsjh4'
+
+BASE_PATH = settings.BET_API_HOST
+API_SECRET_KEY = settings.BET_API_SECRET_KEY
+tz = timezone(timedelta(hours=0), name=settings.TIME_ZONE)
 
 LOG = logging.getLogger(__name__)
 
@@ -73,6 +75,9 @@ class SportWrapper(BetApiWrapper):
         sports = Sport.objects.all()
         return sports
 
+    def delete_all_from_db(self) -> int:
+        return Sport.objects.filter(request_type=self.request_type).delete()
+
     def save_items_to_db(self) -> None:
         """
         save all sport from request to db
@@ -84,7 +89,8 @@ class SportWrapper(BetApiWrapper):
                 if not Sport.objects.filter(api_id=sport.get('id')).first():
                     Sport.objects.create(api_id=sport.get('id'),
                                          name=sport.get('name'),
-                                         name_en=sport.get('name_en'))
+                                         name_en=sport.get('name_en'),
+                                         request_type=self.request_type)
 
 
 class CountryWrapper(BetApiWrapper):
@@ -121,6 +127,12 @@ class CountryWrapper(BetApiWrapper):
             countries = Country.objects.all()
         return countries
 
+    def delete_all_from_db(self) -> int:
+        if self.sport_id:
+            return Tournament.objects.filter(request_type=self.request_type, sport__api_id=self.sport_id).delete()
+        else:
+            return Tournament.objects.filter(request_type=self.request_type).delete()
+
     def save_items_to_db(self) -> None:
         """
         save all countries from request to db
@@ -135,7 +147,8 @@ class CountryWrapper(BetApiWrapper):
                         Country.objects.create(api_id=country.get('id'),
                                                name=country.get('name'),
                                                name_en=country.get('name_en'),
-                                               sport=sport)
+                                               sport=sport,
+                                               request_type=self.request_type)
                     except Sport.DoesNotExist:
                         LOG.debug(f"SPORT_ID: {country.get('sport_id')}")
                         continue
@@ -147,7 +160,7 @@ class TournamentWrapper(BetApiWrapper):
                  request_type: str = 'line',
                  lang: str = 'ru',
                  sport_id: int = 0,
-                 country_id: int = 0):
+                 country_id: int = 0, count: int = None):
         """
         get all countries of some sport and some country
         :param request_type:
@@ -188,6 +201,9 @@ class TournamentWrapper(BetApiWrapper):
             tournaments = Tournament.objects.all()
         return tournaments
 
+    def delete_all_from_db(self) -> int:
+        return Tournament.objects.filter(request_type=self.request_type).delete()
+
     def save_items_to_db(self) -> None:
         """
         save all countries from request to db
@@ -204,7 +220,8 @@ class TournamentWrapper(BetApiWrapper):
                                                   name=tournament.get('name'),
                                                   name_en=tournament.get('name_en'),
                                                   sport=sport,
-                                                  country=country)
+                                                  country=country,
+                                                  request_type=self.request_type)
                     except Sport.DoesNotExist:
                         LOG.error(f"SPORT_ID: {tournament.get('sport_id')}")
                         continue
@@ -219,7 +236,7 @@ class MatchWrapper(BetApiWrapper):
                  request_type: str = 'line',
                  lang: str = 'ru',
                  sport_id: int = 0,
-                 country_id: int = 0):
+                 country_id: int = 0, count: int = 100):
         """
         get all countries of some sport and some country
         :param request_type:
@@ -230,17 +247,24 @@ class MatchWrapper(BetApiWrapper):
         super(MatchWrapper, self).__init__(request_type, lang)
         self.sport_id = sport_id
         self.country_id = country_id
+        self.count = count
 
     def _do_request(self) -> Union[Dict, None]:
         """
         do request to bet api and get all events to json format
         :return:
         """
-        response = requests.get(f'{self.url}/events/{self.sport_id}/{self.country_id}/sub/1000/{self.request_type}/{self.lang}', headers=self.headers)
+        response = requests.get(f'{self.url}/events/{self.sport_id}/{self.country_id}/sub/{self.count}/{self.request_type}/{self.lang}', headers=self.headers)
         if response.ok:
             return response.json()
         else:
             return None
+
+    def delete_all_from_db(self) -> int:
+        matches = Match.objects.filter(request_type=self.request_type).all()
+        for m in matches:
+            m.events.all().delete()
+        return matches.delete()[0]
 
     def get_all_db_items(self) -> QuerySet:
         """
@@ -267,32 +291,92 @@ class MatchWrapper(BetApiWrapper):
         """
         items = self._do_request()
         if items:
+            LOG.debug(items)
+            if isinstance(items['body'], str):
+                LOG.error(f"{items['body']} {datetime.utcnow()}")
+                return
             for tournament in items['body']:
                 for match in tournament['events_list']:
-                    if not Match.objects.filter(uniq=match.get('uniq')).first():
+                    old_match = Match.objects.filter(game_num=match.get('game_num')).first()
+                    if not old_match:
                         try:
                             sport = Sport.objects.get(api_id=match.get('sport_id'))
                             tor = Tournament.objects.get(api_id=match.get('tournament_id'))
                             new_match = Match.objects.create(game_num=match.get('game_num'),
+                                                             game_id=match.get('game_id'),
                                                              sport=sport,
                                                              tournament=tor,
-                                                             game_start=datetime.fromtimestamp(match.get('game_start')),
+                                                             game_start=datetime.fromtimestamp(match.get('game_start'), tz=tz),
                                                              opp_1_name=match.get('opp_1_name'),
                                                              opp_2_name=match.get('opp_2_name'),
                                                              opp_1_id=match.get('opp_1_id'),
-                                                             opp_2_id=match.get('opp_2_id'))
+                                                             opp_2_id=match.get('opp_2_id'),
+                                                             opp_1_icon=f'https://cdn.incub.space/v1/opp/icon/{match.get("opp_1_icon")}.png',
+                                                             opp_2_icon=f'https://cdn.incub.space/v1/opp/icon/{match.get("opp_2_icon")}.png',
+                                                             score_full=match.get('score_full'),
+                                                             score_period=match.get('score_period'),
+                                                             period_name=match.get('period_name'),
+                                                             request_type=self.request_type,
+                                                             ended=bool(match.get('finale')))
                         except Sport.DoesNotExist:
                             LOG.error(f"SPORT_ID: {match.get('sport_id')}")
                             continue
                         except Tournament.DoesNotExist:
                             LOG.error(f"TOURNAMENT_ID: {match.get('tournament_id')}")
                             continue
-                                
+
                         for event in match.get('game_oc_list'):
                             new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
                                                                   oc_name=event['oc_name'],
                                                                   oc_rate=event['oc_rate'],
                                                                   oc_pointer=event['oc_pointer'])
                             new_match.events.add(new_event)
+                        LOG.info(f'{new_match.game_num}, events: {new_match.events.count()}')
+
+                    else:
+                        old_match.score_full = match.get('score_full')
+                        old_match.score_period = match.get('score_period')
+                        old_match.period_name = match.get('period_name')
+                        old_match.request_type = self.request_type
+                        old_match.ended = bool(match.get('finale'))
+                        old_match.save()
 
 
+class CurrentMatchWrapper(BetApiWrapper):
+
+    def __init__(self,
+                 request_type: str = 'line',
+                 lang: str = 'ru', game_id: int = None):
+        """
+        get all countries of some sport and some country
+        :param request_type:
+        :param lang:
+        :param game_id: info about match
+        """
+        super(CurrentMatchWrapper, self).__init__(request_type, lang)
+        self.game_id = game_id
+
+    def _do_request(self) -> Union[Dict, None]:
+        """
+        do request to bet api and get all events to json format
+        :return:
+        """
+        response = requests.get(f'{self.url}/event/{self.game_id}/sub/{self.request_type}/{self.lang}', headers=self.headers)
+        if response.ok:
+            return response.json()
+        else:
+            return None
+
+    def close_current_match(self):
+        resp = self._do_request()
+        if resp:
+            if isinstance(resp['body'], str):
+                LOG.error(f"{resp['body']} {datetime.utcnow()}")
+                return
+            if resp['body'] == [] or resp['body'].get('finale', False) is True:
+                try:
+                    match = Match.objects.get(game_id=self.game_id)
+                    match.ended = True
+                    match.save()
+                except Match.DoesNotExist:
+                    return
