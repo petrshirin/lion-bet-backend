@@ -69,11 +69,11 @@ def change_password(request: Request) -> Dict:
         try:
             check_password(ser.validated_data['password1'], ser.validated_data['password2'])
         except ValueError as err:
-            return {'errors': err, 'success': False}
+            return {'errors': str(err), 'success': False}
         request.user.set_password(ser.validated_data['password1'])
         return {'data': 'ok', 'success': True}
     else:
-        return ser.errors
+        return {'errors': ser.errors, 'success': False}
 
 
 def change_client_info(request: Request) -> Dict:
