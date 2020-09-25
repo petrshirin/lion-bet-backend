@@ -167,15 +167,14 @@ def check_code(mail_type: int, code: str) -> Union[UserEmail, None]:
 
 
 def user_forgot_password(request: Request) -> Dict:
-    email = request.data.get('email')
-    username = request.data.get('username')
-    if not email and not username:
+    user_info = request.data.get('user_info')
+    if not user_info:
         return {"errors": "do not have data", 'success': False}
-    client = Client.objects.filter(Q(email=email) | Q(user__username=username)).first()
+    client = Client.objects.filter(Q(email=user_info) | Q(user__username=user_info)).first()
     if not client:
         return {"errors": "do not find user with this data", 'success': False}
     new_password = ''.join([random.choice(string.ascii_letters) for i in range(7)])
-    is_send = send_email_to_user(2, [email], f"user: {client.user.username}\n new_password: {new_password}\n")
+    is_send = send_email_to_user(2, [client.email], f"user: {client.user.username}\n new_password: {new_password}\n")
     if not is_send:
         LOG.error('template dont find')
         return {"errors": "Email do not send", 'success': False}
