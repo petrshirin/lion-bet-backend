@@ -1,7 +1,8 @@
 from rest_framework.utils.serializer_helpers import ReturnList
 from sport_events.betapi_wrapper import *
-from sport_events.serializers import TournamentSerializer, MatchSerializer, SportSerializer, CountrySerializer
+from sport_events.serializers import TournamentSerializer, MatchSerializer, SportSerializer, CountrySerializer, SimpleMatchSerializer
 from django.db.models.query import Q
+from typing import List
 
 
 def get_live_sports() -> ReturnList:
@@ -36,8 +37,6 @@ def get_live_tournaments(sport_id: int = None, country_id: int = None, count: in
 
 
 def get_live_matches(tournament_id: int = None, count: int = None) -> ReturnList:
-    match_api = MatchWrapper('live')
-    match_api.save_items_to_db()
     live_query = Q(request_type='live', deleted=False, ended=False)
     if tournament_id:
         tournament_query = Q(tournament__api_id=tournament_id)
@@ -49,3 +48,22 @@ def get_live_matches(tournament_id: int = None, count: int = None) -> ReturnList
         matches = matches[:count]
 
     return MatchSerializer(matches, many=True).data
+
+
+def get_list_of_tournaments_with_matches_live(sport_id: int = 0) -> List:
+    if sport_id:
+        live_query_t = Q(request_type='live', deleted=False, sport__api_id=sport_id)
+    else:
+        live_query_t = Q(request_type='live', deleted=False)
+
+    tournaments = Tournament.objects.filter(live_query_t).all()
+    live_query_m = Q(request_type='live', deleted=False, ended=False)
+    data = []
+    for tournament in tournaments:
+        matches = Match.objects.filter(live_query_m, tournament=tournament).all()
+        matches_ser = SimpleMatchSerializer(matches, many=True)
+        tournament_ser = TournamentSerializer(tournament)
+        tmp_data = dict(tournament_ser.data)
+        tmp_data['matches'] = matches_ser.data
+        data.append(tmp_data)
+    return data

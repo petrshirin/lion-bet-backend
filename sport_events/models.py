@@ -53,7 +53,7 @@ class Match(models.Model):
     opp_2_id = models.IntegerField()
     opp_1_icon = models.URLField()
     opp_2_icon = models.URLField()
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='m_tournament')
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='matches')
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name='m_sport')
     events = models.ManyToManyField(MatchEvent)
     score_full = models.CharField(max_length=20)

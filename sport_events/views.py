@@ -3,8 +3,8 @@ from rest_framework.views import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.request import Request
-from .services.line_events import get_line_sports, get_line_countries, get_line_tournaments, get_line_matches
-from .services.live_events import get_live_sports, get_live_countries, get_live_tournaments, get_live_matches
+from .services.line_events import get_line_sports, get_line_countries, get_line_tournaments, get_line_matches, get_list_of_tournaments_with_matches_line
+from .services.live_events import get_live_sports, get_live_countries, get_live_tournaments, get_live_matches, get_list_of_tournaments_with_matches_live
 
 
 @api_view(['GET'])
@@ -77,8 +77,20 @@ def matches_live_view(request: Request, tournament_id: int = None, count: int = 
     return Response({'success': True, 'data': matches}, status=200)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def tournaments_with_matches_line_view(request: Request) -> Response:
+
+    tournaments_data = get_list_of_tournaments_with_matches_line()
+
+    return Response({'success': True, 'data': tournaments_data}, status=200)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def tournaments_with_matches_live_view(request: Request, sport_id: int = 0) -> Response:
 
+    tournaments_data = get_list_of_tournaments_with_matches_live()
 
+    return Response({'success': True, 'data': tournaments_data}, status=200)
 

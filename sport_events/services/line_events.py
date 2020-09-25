@@ -1,8 +1,9 @@
 from rest_framework.request import Request
 from rest_framework.utils.serializer_helpers import ReturnList
 from sport_events.betapi_wrapper import *
-from sport_events.serializers import SportSerializer, CountrySerializer, TournamentSerializer, MatchSerializer
+from sport_events.serializers import SportSerializer, CountrySerializer, TournamentSerializer, MatchSerializer, SimpleMatchSerializer
 from django.db.models.query import Q
+from typing import List
 
 
 def get_line_sports() -> ReturnList:
@@ -50,6 +51,22 @@ def get_line_matches(tournament_id: int = None, count: int = None) -> ReturnList
     return MatchSerializer(matches, many=True).data
 
 
+def get_list_of_tournaments_with_matches_line(sport_id: int = 0) -> List:
+    if sport_id:
+        live_query_t = Q(request_type='line', deleted=False, sport__api_id=sport_id)
+    else:
+        live_query_t = Q(request_type='line', deleted=False)
 
+    tournaments = Tournament.objects.filter(live_query_t).all()
+    live_query_m = Q(request_type='line', deleted=False, ended=False)
+    data = []
+    for tournament in tournaments:
+        matches = Match.objects.filter(live_query_m, tournament=tournament).all()
+        matches_ser = SimpleMatchSerializer(matches, many=True)
+        tournament_ser = TournamentSerializer(tournament)
+        tmp_data = dict(tournament_ser.data)
+        tmp_data['matches'] = matches_ser.data
+        data.append(tmp_data)
+    return data
 
 
