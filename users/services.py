@@ -8,6 +8,11 @@ from .serializers import ClientInfoSerializer, ClientRegisterSerializer, \
 from .Exceptions import UniqueUser
 from django.db.models.query import Q
 from rest_framework.authtoken.models import Token
+from django.core.mail import send_mail
+import logging
+
+
+LOG = logging.getLogger(__name__)
 
 
 def get_self_info_client(request: Request) -> ReturnDict:
@@ -44,11 +49,16 @@ def register_client(request: Request) -> Dict:
             user = User.objects.create_user(username=request.data.get('username'),
                                             password=request.data.get('password1'),
                                             email=ser.data['email'])
-            Client.objects.create(**ser.validated_data, user=user)
+            client = Client.objects.create(**ser.validated_data, user=user)
 
         except Exception as err:
             return {'errors': str(err), 'success': False}
         key = generate_token(user)
+        new_email = UserEmail(template_id=1, user=user)
+        new_email.generate_code()
+        is_send = send_email_to_user(1, [client.email], f'http://front.ru/password/forgot/{new_email.code}')
+        if is_send:
+            new_email.save()
         if key is not None:
             return {'data': ser.data, 'success': True, 'key': key}
         else:
@@ -87,6 +97,14 @@ def change_client_info(request: Request) -> Dict:
     """
     ser = ChangeClientInfoSerializer(data=request.data)
     if ser.is_valid():
+        if ser.validated_data.get('email') and request.user.client.email != ser.validated_data['email']:
+            request.user.client.activated = False
+            new_email = UserEmail(template_id=1, user=request.user)
+            new_email.generate_code()
+            is_send = send_email_to_user(1, [request.user.client.email], f'http://front.ru/password/forgot/{new_email.code}')
+            if is_send:
+                new_email.save()
+            request.user.client.save()
         ser.update(request.user.client, validated_data=ser.validated_data)
         return {'data': 'ok', 'success': True}
     else:
@@ -126,5 +144,59 @@ def generate_token(user: User) -> Union[str, None]:
         return token.key
     else:
         return None
+
+
+def send_email_to_user(mail_type: int = 1, recipient_list: List[str] = None, email_info: str = None) -> bool:
+    try:
+        template = EmailTemplate.objects.get(pk=mail_type)
+    except EmailTemplate.DoesNotExist:
+        return False
+    result = send_mail(template.subject, template.text.format(email_info), template.from_email, recipient_list)
+    LOG.info(f'Email of type {mail_type} send this users: {recipient_list}, result: {result}')
+    if result:
+        return True
+    else:
+        return False
+
+
+def check_code(mail_type: int, code: str) -> Union[UserEmail, None]:
+    mail = UserEmail.objects.filter(template_id=mail_type).last()
+    if mail.code == code:
+        return mail
+    return None
+
+
+def user_forgot_password(request: Request) -> Dict:
+    email = request.data.get('email')
+    username = request.data.get('username')
+    if not email and not username:
+        return {"errors": "do not have data", 'success': False}
+    client = Client.objects.filter(Q(email=email) | Q(user__username=username)).first()
+    if not client:
+        return {"errors": "do not find user with this data", 'success': False}
+    new_password = ''.join([random.choice(string.ascii_letters) for i in range(7)])
+    is_send = send_email_to_user(2, [email], f"user: {client.user.username}\n new_password: {new_password}\n")
+    if not is_send:
+        LOG.error('template dont find')
+        return {"errors": "Email do not send", 'success': False}
+    new_email = UserEmail(template_id=2, user=client.user)
+    new_email.generate_code()
+    new_email.is_view = True
+    new_email.save()
+    request.user.set_password(new_password)
+    request.user.save()
+    return {"data": {'email': client.email}, 'success': True}
+
+
+def activate_user_on_email(code: str) -> Dict:
+    mail = check_code(1, code)
+    if mail:
+        mail.user.client.activated = True
+        mail.user.client.save()
+        mail.is_view = True
+        mail.save()
+        return {'data': 'ok', 'success': True}
+    else:
+        return {'errors': 'invalid code', 'success': False}
 
 
