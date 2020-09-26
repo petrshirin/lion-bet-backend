@@ -63,7 +63,7 @@ def register_client(request: Request) -> Dict:
             return {'data': ser.data, 'success': True, 'key': key}
         else:
             return {'data': ser.data, 'success': False,
-                    'errors': "token does not generated, need to use login form"}
+                    'errors': "Токен не сгенерировал, используйте форму логина"}
     else:
         return {'errors': ser.errors, 'success': False}
 
@@ -78,7 +78,7 @@ def change_password(request: Request) -> Dict:
     if ser.is_valid():
         try:
             if not request.user.check_password(ser.validated_data['old_password']):
-                return {'errors': "old password is not correct", 'success': False}
+                return {'errors': "Неверный старый пароль", 'success': False}
             check_password(ser.validated_data['password1'], ser.validated_data['password2'])
         except ValueError as err:
             return {'errors': str(err), 'success': False}
@@ -120,7 +120,7 @@ def check_user_from_db(username: str, email: str) -> bool:
     :return: True
     """
     if User.objects.filter(Q(username=username) | Q(email=email)).first():
-        raise UniqueUser("user already exist")
+        raise UniqueUser("Пользователь уже существует")
     else:
         return True
 
@@ -135,7 +135,7 @@ def check_password(password1: str, password2: str) -> bool:
     if password1 == password2:
         return True
     else:
-        raise ValueError('Passwords do not match')
+        raise ValueError('Пароли не совпадают')
 
 
 def generate_token(user: User) -> Union[str, None]:
@@ -169,15 +169,15 @@ def check_code(mail_type: int, code: str) -> Union[UserEmail, None]:
 def user_forgot_password(request: Request) -> Dict:
     user_info = request.data.get('user_info')
     if not user_info:
-        return {"errors": "do not have data", 'success': False}
+        return {"errors": "нет данных", 'success': False}
     client = Client.objects.filter(Q(email=user_info) | Q(user__username=user_info)).first()
     if not client:
-        return {"errors": "do not find user with this data", 'success': False}
+        return {"errors": "Пользователь не найден", 'success': False}
     new_password = ''.join([random.choice(string.ascii_letters) for i in range(7)])
     is_send = send_email_to_user(2, [client.email], f"user: {client.user.username}\n new_password: {new_password}\n")
     if not is_send:
         LOG.error('template dont find')
-        return {"errors": "Email do not send", 'success': False}
+        return {"errors": "Не удалось отправить email", 'success': False}
     new_email = UserEmail(template_id=2, user=client.user)
     new_email.generate_code()
     new_email.is_view = True
@@ -196,6 +196,6 @@ def activate_user_on_email(code: str) -> Dict:
         mail.save()
         return {'data': 'ok', 'success': True}
     else:
-        return {'errors': 'invalid code', 'success': False}
+        return {'errors': 'Код устарел', 'success': False}
 
 
