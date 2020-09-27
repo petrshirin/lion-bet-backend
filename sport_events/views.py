@@ -79,9 +79,9 @@ def matches_live_view(request: Request, tournament_id: int = None, count: int = 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def tournaments_with_matches_line_view(request: Request) -> Response:
+def tournaments_with_matches_line_view(request: Request, sport_id: int = 0) -> Response:
 
-    tournaments_data = get_list_of_tournaments_with_matches_line()
+    tournaments_data = get_list_of_tournaments_with_matches_line(sport_id)
 
     return Response({'success': True, 'data': tournaments_data}, status=200)
 
@@ -90,7 +90,7 @@ def tournaments_with_matches_line_view(request: Request) -> Response:
 @permission_classes([IsAuthenticated])
 def tournaments_with_matches_live_view(request: Request, sport_id: int = 0) -> Response:
 
-    tournaments_data = get_list_of_tournaments_with_matches_live()
+    tournaments_data = get_list_of_tournaments_with_matches_live(sport_id)
 
     return Response({'success': True, 'data': tournaments_data}, status=200)
 
