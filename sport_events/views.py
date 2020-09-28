@@ -8,7 +8,7 @@ from .services.live_events import get_live_sports, get_live_countries, get_live_
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def sports_line_view(request: Request) -> Response:
 
     sports = get_line_sports()
@@ -17,7 +17,7 @@ def sports_line_view(request: Request) -> Response:
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def country_line_view(request: Request, sport_id: int = None) -> Response:
     countries = get_line_countries(sport_id)
 
@@ -25,7 +25,7 @@ def country_line_view(request: Request, sport_id: int = None) -> Response:
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def tournaments_line_view(request: Request, sport_id: int = None, country_id: int = None, count: int = None) -> Response:
 
     tournaments = get_line_tournaments(sport_id, country_id, count)
@@ -34,7 +34,7 @@ def tournaments_line_view(request: Request, sport_id: int = None, country_id: in
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def matches_line_view(request: Request, tournament_id: int = None, count: int = None) -> Response:
 
     matches = get_line_matches(tournament_id, count)
@@ -43,7 +43,7 @@ def matches_line_view(request: Request, tournament_id: int = None, count: int = 
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def sports_live_view(request: Request) -> Response:
 
     sports = get_live_sports()
@@ -52,7 +52,7 @@ def sports_live_view(request: Request) -> Response:
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def country_live_view(request: Request, sport_id: int = None) -> Response:
     countries = get_live_countries(sport_id)
 
@@ -60,7 +60,7 @@ def country_live_view(request: Request, sport_id: int = None) -> Response:
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def tournaments_live_view(request: Request, sport_id: int = None, country_id: int = None, count: int = None) -> Response:
 
     tournaments = get_live_tournaments(sport_id, country_id, count)
@@ -69,7 +69,7 @@ def tournaments_live_view(request: Request, sport_id: int = None, country_id: in
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def matches_live_view(request: Request, tournament_id: int = None, count: int = None) -> Response:
 
     matches = get_live_matches(tournament_id, count)
@@ -78,7 +78,7 @@ def matches_live_view(request: Request, tournament_id: int = None, count: int = 
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def tournaments_with_matches_line_view(request: Request, sport_id: int = 0) -> Response:
 
     tournaments_data = get_list_of_tournaments_with_matches_line(sport_id)
@@ -87,7 +87,7 @@ def tournaments_with_matches_line_view(request: Request, sport_id: int = 0) -> R
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def tournaments_with_matches_live_view(request: Request, sport_id: int = 0) -> Response:
 
     tournaments_data = get_list_of_tournaments_with_matches_live(sport_id)
