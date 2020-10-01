@@ -367,7 +367,7 @@ class CurrentMatchWrapper(BetApiWrapper):
         else:
             return None
 
-    def close_current_match(self):
+    def close_current_match(self) -> None:
         resp = self._do_request()
         if resp:
             if isinstance(resp['body'], str):

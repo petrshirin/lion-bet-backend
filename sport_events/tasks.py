@@ -59,10 +59,7 @@ def update_matches_live():
 def close_matches():
     for match in Match.objects.filter(deleted=False, ended=False):
         current_match_api = CurrentMatchWrapper(game_id=match.game_num)
-        result = current_match_api.close_current_match()
-        if not result:
-            match.ended = True
-            match.save()
+        current_match_api.close_current_match()
 
 
 
