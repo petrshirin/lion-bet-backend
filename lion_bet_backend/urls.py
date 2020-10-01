@@ -24,5 +24,5 @@ urlpatterns = [
     path('sport_events/', include('sport_events.urls'), name='sport_events'),
     path('payments/', include('user_payment.urls'), name="payments"),
     path('bet/', include('user_bet.urls'), name='user_bet'),
-    path('/api/bet/result', process_bet_view),
+    path('api/bet/result', process_bet_view),
 ]
