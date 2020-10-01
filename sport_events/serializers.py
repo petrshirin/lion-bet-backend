@@ -54,5 +54,7 @@ class SimpleMatchSerializer(serializers.ModelSerializer):
         model = Match
         fields = ('game_num', 'name', 'name_en', 'game_start',
                   'opp_1_name', 'opp_2_name', 'opp_1_id', 'opp_2_id', 'opp_1_icon', 'opp_2_icon',
-                  'score_full', 'score_period', 'period_name', 'events')
+                  'score_full', 'score_period', 'period_name', 'events', 'sport')
+
+    sport = SportSerializer()
 

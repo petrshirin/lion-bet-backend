@@ -62,6 +62,8 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0) -> List:
     data = []
     for tournament in tournaments:
         matches = Match.objects.filter(live_query_m, tournament=tournament).all()
+        if not matches:
+            continue
         matches_ser = SimpleMatchSerializer(matches, many=True)
         tournament_ser = TournamentSerializer(tournament)
         tmp_data = dict(tournament_ser.data)
