@@ -55,12 +55,14 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_auth.registration',
     'users',
+    'user_bet',
+    'user_payment',
     'lion_bet.apps.LionBetConfig',
     'techsupport',
     'djkombu',
     'sport_events',
     'django_celery_results',
-    'django_celery_beat'
+    'django_celery_beat',
 
 ]
 
@@ -242,8 +244,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
 # betAPI
-BET_API_HOST = 'https://odds.incub.space'
+BET_API_HOST = os.environ.get('BET_API_HOST')
 BET_API_SECRET_KEY = os.environ.get('BET_API_SECRET_KEY')
+
+# go bet API
+MAKE_BET_API_URL = os.environ.get('MAKE_BET_API_URL')
+REMOTE_HOST = "http://royal-lion.bet"
+MAKE_BET_PARTNER_ID = os.environ.get('MAKE_BET_PARTNER_ID')
+GO_BET_EMAIL = "example@google.com"
+GO_BET_PASSWORD = "1233"
 
 if DEBUG and not SERVER:
     STATICFILES_DIRS = (
@@ -264,5 +273,6 @@ DEFAULT_EMAIL = "mail@lionbet.com"
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = "./tmp/mails"
 
-
+#QIWI settings
+QIWI_PUBLIC_KEY = os.environ["QIWI_PUBLIC_KEY"]
 

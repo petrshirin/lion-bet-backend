@@ -15,10 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from user_bet.views import process_bet_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('users.urls'), name='users'),
     path('support/', include('techsupport.urls'), name='techsupport'),
-    path('sport_events/', include('sport_events.urls'), name='sport_events')
+    path('sport_events/', include('sport_events.urls'), name='sport_events'),
+    path('payments/', include('user_payment.urls'), name="payments"),
+    path('bet/', include('user_bet.urls'), name='user_bet'),
+    path('/api/bet/result', process_bet_view),
 ]
