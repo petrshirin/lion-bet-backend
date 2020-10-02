@@ -15,6 +15,9 @@ def make_bet(request: Request, bet_type: str) -> Dict:
 
     validated_data = _validate_bet_request_data(request.data)
 
+    if request.user.customeraccount.blocked:
+        return {"errors": "Ваш счет заблокирова", "success": False}
+
     if validated_data.get('errors'):
         return validated_data
     else:

@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Client, Gender, User
+from .models import Client, Gender, User, CustomerAccount
 
 
 class ClientInfoSerializer(serializers.ModelSerializer):
@@ -11,6 +11,13 @@ class ClientInfoSerializer(serializers.ModelSerializer):
         model = Client
         fields = ('id', 'first_name', 'second_name', 'email',
                   'date_birth', 'phone_number', 'gender', 'city')
+
+
+class CustomerAccountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomerAccount
+        fields = ('current_balance',)
 
 
 class ClientRegisterSerializer(serializers.ModelSerializer):

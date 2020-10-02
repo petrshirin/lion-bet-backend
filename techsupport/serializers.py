@@ -8,7 +8,7 @@ class ClientRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientRequest
-        fields = ('number', 'department', 'request', 'email_to_answer')
+        fields = ('number', 'department', 'request', 'email_to_answer', 'closed')
 
 
 class ClientRequestPostSerializer(serializers.ModelSerializer):

@@ -12,6 +12,8 @@ LOG = logging.getLogger(__name__)
 
 def make_input_request(request: Request) -> Dict:
     wrapper = QiwiWrapper()
+    if request.user.customeraccount.blocked:
+        return {"errors": "Ваш счет заблокирова", "success": False}
     if request.data.get('amount'):
         try:
             amount = float(request.data.get('amount'))
@@ -25,6 +27,8 @@ def make_input_request(request: Request) -> Dict:
 
 
 def make_output_request(request: Request) -> Dict:
+    if request.user.customeraccount.blocked:
+        return {"errors": "Ваш счет заблокирова", "success": False}
     if request.data.get('amount'):
         try:
             amount = float(request.data.get('amount'))

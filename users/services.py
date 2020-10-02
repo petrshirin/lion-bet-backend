@@ -4,7 +4,7 @@ from typing import Optional, List, \
     Dict, Any, Union
 from rest_framework.request import Request
 from .serializers import ClientInfoSerializer, ClientRegisterSerializer, \
-    ChangePasswordSerializer, ChangeClientInfoSerializer
+    ChangePasswordSerializer, ChangeClientInfoSerializer, CustomerAccountSerializer
 from .Exceptions import UniqueUser
 from django.db.models.query import Q
 from rest_framework.authtoken.models import Token
@@ -23,7 +23,10 @@ def get_self_info_client(request: Request) -> ReturnDict:
     :return:
     """
     client_info_serializer = ClientInfoSerializer(request.user.client)
-    return client_info_serializer.data
+    customer_account = CustomerAccountSerializer(request.user.customeraccount)
+    data = client_info_serializer.data
+    data['customer_account'] = customer_account.data
+    return data
 
 
 def register_client(request: Request) -> Dict:
