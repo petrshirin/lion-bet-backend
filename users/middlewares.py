@@ -22,7 +22,7 @@ class AdminPaymentLogMiddleware:
             try:
                 user = User.objects.get(pk=request.POST['user'])
                 AdminPaymentLog.objects.create(admin=request.user,
-                                               amount=abs(request.POST['current_balance']-user.customeraccount.current_balance))
+                                               amount=abs(float(request.POST['current_balance'])-float(user.customeraccount.current_balance)))
             except Exception as err:
                 LOG.error(err)
         return response
