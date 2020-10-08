@@ -25,4 +25,5 @@ urlpatterns = [
     path('payments/', include('user_payment.urls'), name="payments"),
     path('bet/', include('user_bet.urls'), name='user_bet'),
     path('api/bet/result', process_bet_view),
+    path('admin_tools/', include('admin_tools.urls')),
 ]
