@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'sport_events',
     'django_celery_results',
     'django_celery_beat',
+    'chart_tools',
 
 ]
 
@@ -80,6 +81,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middlewares.AdminPaymentLogMiddleware'
 ]
 
 ROOT_URLCONF = 'lion_bet_backend.urls'
@@ -283,4 +285,5 @@ QIWI_PUBLIC_KEY = os.environ["QIWI_PUBLIC_KEY"]
 
 # Admin
 ADMIN_TOOLS_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'
+ADMIN_TOOLS_MENU = 'menu.CustomMenu'
 FRONT_HOST = 'http://royal-lion.bet'

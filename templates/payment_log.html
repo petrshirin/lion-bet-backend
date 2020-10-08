@@ -1,0 +1,20 @@
+{% extends "admin_tools/dashboard/module.html" %}
+{% block module_content %}
+    <div class="row">
+        <span>ID</span>  <span>Админ</span> <span>Сумма</span>
+    </div>
+    {% for log in module.logs %}
+        <div class="row">
+            <span>{{ log.id }}</span>  <span>{{ log.admin }}</span> <span>{{ log.amount }}</span>
+        </div>
+    {% endfor %}
+    <style>
+        .row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: start;
+            padding: 10px;
+        }
+    </style>
+{% endblock %}
