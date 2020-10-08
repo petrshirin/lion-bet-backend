@@ -30,7 +30,7 @@ class AdminPaymentLogMiddleware:
                 and 'customeraccount' in request.path \
                     and 'change' in request.path:
             try:
-                if not old_balance:
+                if old_balance is None:
                     return response
                 AdminPaymentLog.objects.create(admin=request.user,
                                                amount=abs(float(request.POST['current_balance'])-float(old_balance)))
