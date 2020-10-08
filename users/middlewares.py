@@ -13,6 +13,9 @@ class AdminPaymentLogMiddleware:
 
     def __call__(self, request: HttpRequest):
 
+        user = User.objects.get(pk=request.POST['user'])
+        old_balance = user.customeraccount.current_balance
+
         response = self.get_response(request)
 
         if request.user.is_staff \
@@ -20,9 +23,9 @@ class AdminPaymentLogMiddleware:
                 and 'customeraccount' in request.path \
                 and 'change' in request.path:
             try:
-                user = User.objects.get(pk=request.POST['user'])
+
                 AdminPaymentLog.objects.create(admin=request.user,
-                                               amount=abs(float(request.POST['current_balance'])-float(user.customeraccount.current_balance)))
+                                               amount=abs(float(request.POST['current_balance'])-float(old_balance)))
             except Exception as err:
                 LOG.error(err)
         return response
