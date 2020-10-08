@@ -40,6 +40,10 @@ SITE_ID = 1
 
 INSTALLED_APPS = [
     'corsheaders',
+    'admin_tools',
+    'admin_tools.theming',
+    'admin_tools.menu',
+    'admin_tools.dashboard',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -240,7 +244,7 @@ CELERY_CACHE_BACKEND = 'django-cache'
 
 # Static files
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # betAPI
@@ -249,15 +253,15 @@ BET_API_SECRET_KEY = os.environ.get('BET_API_SECRET_KEY')
 
 # go bet API
 MAKE_BET_API_URL = os.environ.get('MAKE_BET_API_URL')
-REMOTE_HOST = "http://royal-lion.bet"
+REMOTE_HOST = "http://api.royal-lion.bet"
 MAKE_BET_PARTNER_ID = os.environ.get('MAKE_BET_PARTNER_ID')
 GO_BET_EMAIL = "example@google.com"
 GO_BET_PASSWORD = "1233"
 
-if DEBUG and not SERVER:
-    STATICFILES_DIRS = (
-         os.path.join(BASE_DIR, 'static'),
-    )
+#if DEBUG and not SERVER:
+#    STATICFILES_DIRS = (
+#         os.path.join(BASE_DIR, 'static'),
+#    )
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -273,6 +277,10 @@ DEFAULT_EMAIL = "mail@lionbet.com"
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = "./tmp/mails"
 
-#QIWI settings
+# QIWI settings
 QIWI_PUBLIC_KEY = os.environ["QIWI_PUBLIC_KEY"]
 
+
+# Admin
+ADMIN_TOOLS_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'
+FRONT_HOST = 'http://royal-lion.bet'
