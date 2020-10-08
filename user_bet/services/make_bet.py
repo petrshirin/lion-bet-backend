@@ -7,22 +7,46 @@ import logging
 from sport_events.models import MatchEvent
 from django.conf import settings
 from user_bet.serializers import UserBetSerializers
+from random import choice
+import string
 
 LOG = logging.getLogger(__name__)
 
 
 def make_bet(request: Request, bet_type: str) -> Dict:
-
     validated_data = _validate_bet_request_data(request.data)
 
     if request.user.customeraccount.blocked:
-        return {"errors": "Ваш счет заблокирова", "success": False}
+        LOG.info(f'customer account is blocked')
+        return {"errors": "Ваш счет заблокирован", "success": False}
 
     if validated_data.get('errors'):
         return validated_data
     else:
         events = bet_ids_to_models(validated_data['bets_ids'])
         amount = validated_data['amount']
+
+    if check_admin_bet(events):
+        if len(events) == 1:
+            new_model_bet = _save_bet_to_db(request.user, {'bet_code': ''.join(choice(string.ascii_lowercase) for i in range(8)),
+                                                           'd': {"BetHeadDetail": {"Coef": events[0].oc_rate,
+                                                                                   "PosWin": amount * events[0].oc_rate
+                                                                                   }
+                                                                 }
+                                                           },
+                                            bet_type, amount)
+            if not new_model_bet:
+                LOG.error(f'error in save bet')
+                return {"errors": f"Ошибка при создании ставки", 'success': False}
+            model_bet = _add_to_model_events(new_model_bet, events)
+            if not model_bet:
+                new_model_bet.delete()
+                LOG.error(f'error in save bet events')
+                return {"errors": f"Ошибка при создании ставки, Ошибка в ивентах", 'success': False}
+            bet_ser = UserBetSerializers(new_model_bet)
+            return {"data": bet_ser.data, "success": True}
+        else:
+            return {"errors": f"Одна или несколько ставок недоступны, для экспресса", 'success': False}
 
     if not check_user_balance(request.user, amount):
         return {"errors": "Недостаточно средств для совершения операции", 'success': False}
@@ -45,6 +69,8 @@ def make_bet(request: Request, bet_type: str) -> Dict:
         new_model_bet.delete()
         return {"errors": f"Ошибка при создании ставки, Ошибка в ивентах", 'success': False}
     bet_ser = UserBetSerializers(new_model_bet)
+    request.user.customeraccount.current_balance -= new_model_bet.user_bet
+    request.user.customeraccount.save()
     return {"data": bet_ser.data, "success": True}
 
 
@@ -95,7 +121,7 @@ def _do_request_to_go_bet(list_bets: List, amount) -> Union[Dict, None]:
     return wrapper.make_bet(list_bets, amount)
 
 
-def _save_bet_to_db(user: User, new_bet: Dict, bet_type: str, amount) -> Union[UserBet, None]:
+def _save_bet_to_db(user: User, new_bet: Dict, bet_type: str, amount: float) -> Union[UserBet, None]:
     try:
         new_model_bet = UserBet.objects.create(user=user,
                                                bet_type=bet_type,
@@ -123,3 +149,12 @@ def _add_to_model_events(new_model_bet: UserBet, events: List[UserBet]) -> Union
 
 def check_user_balance(user: User, amount: float) -> bool:
     return float(user.customeraccount.current_balance) >= amount
+
+
+def check_admin_bet(events: List[MatchEvent]) -> bool:
+    if len(events) == 1:
+        return events[0].admin_created
+    for event in events:
+        if event.admin_created:
+            return True
+    return False

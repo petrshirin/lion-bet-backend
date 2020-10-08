@@ -4,6 +4,9 @@ from .betapi_wrapper import SportWrapper, CountryWrapper, TournamentWrapper, Mat
 from celery import Celery
 from lion_bet_backend.celery import app
 import logging
+from user_bet.models import UserBet
+from .models import MatchAdminResult
+from django.utils.timezone import now
 
 
 LOG = logging.getLogger(__name__)
@@ -57,9 +60,53 @@ def update_matches_live():
 
 @app.task
 def close_matches():
-    for match in Match.objects.filter(deleted=False, ended=False):
+    for match in Match.objects.filter(deleted=False, ended=False, admin_created=False):
         current_match_api = CurrentMatchWrapper(game_id=match.game_num)
         current_match_api.close_current_match()
+
+
+@app.task
+def close_results_for_admin_matches():
+    matches = Match.objects.filter(deleted=False, ended=False, admin_created=True, game_start__lte=now()).all()
+    for match in matches:
+        match.ended = True
+        match.save()
+        result = MatchAdminResult.objects.filter(match=match).first()
+        if not result:
+            continue
+        for event in match.events.all():
+            user_bets = UserBet.objects.filter(events__in=event).all()
+            result = MatchAdminResult.objects.filter(match=match).first()
+            for user_bet in user_bets:
+                if len(user_bet.events.all()) > 1:
+                    pass
+                else:
+                    user_event = user_bet.events.first()
+                    if user_event.oc_group_name == '1x2':
+                        if result.winner == 'П1':
+                            command_winner = match.opp_1_name
+                        elif result.winner == 'П2':
+                            command_winner = match.opp_1_name
+                        else:
+                            command_winner = 'Ничья'
+                        if user_event.oc_name == command_winner:
+                            user_bet.user.customeraccount.current_balance += user_bet.user_win
+                        else:
+                            user_bet.user.customeraccount.current_balance -= user_bet.user_bet
+                    else:
+                        user_event = user_bet.events.first()
+                        if result.total in user_event.oc_name:
+                            user_bet.user.customeraccount.current_balance += user_bet.user_win
+                        else:
+                            user_bet.user.customeraccount.current_balance -= user_bet.user_win
+
+                    user_bet.is_went = True
+                    user_bet.save()
+                    user_bet.user.customeraccount.save()
+
+
+
+
 
 
 
