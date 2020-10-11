@@ -89,10 +89,16 @@ class AdminPaymentLog(models.Model):
     date_created = models.DateTimeField(default=now)
 
     def get_url_for_user(self):
-        return reverse('admin:users_customeraccount_change', args=[self.user.customeraccount.id])
+        if self.user:
+            return reverse('admin:users_customeraccount_change', args=[self.user.customeraccount.id])
+        else:
+            return ''
 
     def get_url_for_admin(self):
-        return reverse('admin:auth_user_change', args=[self.admin.id])
+        if self.admin:
+            return reverse('admin:auth_user_change', args=[self.admin.id])
+        else:
+            return ''
 
 
 @receiver(post_save, sender=Client)
