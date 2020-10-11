@@ -31,7 +31,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = bool(int(os.environ['DEBUG']))
 SERVER = bool(int(os.environ['SERVER']))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'api.royal-lion.bet']
 
 SITE_ID = 1
 

@@ -16,6 +16,10 @@ def get_users_bet(user: User) -> Dict:
     return {"data": bets_ser.data, 'success': True}
 
 
+def get_user_bets_with_param(user: User, tournament_name: str = None, sport_name: str = None) -> Dict:
+    pass
+
+
 def get_bet_on_ticket(user: User, ticket: str) -> Dict:
     bet = UserBet.objects.filter(user=user, deleted=False, bet_code=ticket).first()
     if not bet:

@@ -33,6 +33,7 @@ def find_bet_for_ticket_view(request: Request, ticket: str) -> Response:
     else:
         return Response(response, status=200)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_user_bet_view(request: Request) -> Response:
