@@ -50,7 +50,7 @@ def get_live_matches(tournament_id: int = None, count: int = None) -> ReturnList
     return MatchSerializer(matches, many=True).data
 
 
-def get_list_of_tournaments_with_matches_live(sport_id: int = 0) -> List:
+def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) -> List:
     if sport_id:
         live_query_t = Q(request_type='live', deleted=False, sport__api_id=sport_id)
     else:
@@ -68,4 +68,4 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0) -> List:
         tmp_data = dict(tournament_ser.data)
         tmp_data['matches'] = matches_ser.data
         data.append(tmp_data)
-    return data
+    return data[page*10:page*10+10]

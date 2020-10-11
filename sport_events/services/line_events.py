@@ -51,7 +51,7 @@ def get_line_matches(tournament_id: int = None, count: int = None) -> ReturnList
     return MatchSerializer(matches, many=True).data
 
 
-def get_list_of_tournaments_with_matches_line(sport_id: int = 0) -> List:
+def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) -> List:
     if sport_id:
         live_query_t = Q(request_type='line', deleted=False, sport__api_id=sport_id)
     else:
@@ -73,7 +73,7 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0) -> List:
             tmp_match['main_events'] = _generate_main_events(match['events'])
         tmp_data['matches'] = matches_ser.data
         data.append(tmp_data)
-    return data
+    return data[page*10:page*10+10]
 
 
 def _generate_main_events(events: List):

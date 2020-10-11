@@ -14,5 +14,7 @@ urlpatterns = [
     path('live/tournaments/<int:sport_id>/<int:country_id>/<int:count>', tournaments_live_view),
     path('live/matches/<int:tournament_id>/<int:count>', matches_live_view),
     path('live/tournaments/list/<int:sport_id>', tournaments_with_matches_live_view),
-    path('line/tournaments/list/<int:sport_id>', tournaments_with_matches_line_view)
+    path('line/tournaments/list/<int:sport_id>', tournaments_with_matches_line_view),
+    path('live/tournaments/list/<int:sport_id>/<int:page>', tournaments_with_matches_live_view),
+    path('line/tournaments/list/<int:sport_id>/<int:page>', tournaments_with_matches_line_view)
 ]
