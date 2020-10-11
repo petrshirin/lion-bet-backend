@@ -147,7 +147,7 @@ def _add_to_model_events(new_model_bet: UserBet, events: List[UserBet]) -> Union
     return new_model_bet
 
 
-def check_user_balance(user: User, amount: float) -> bool:
+def check_balance(user: User, amount: float) -> bool:
     return float(user.customeraccount.current_balance) >= amount
 
 
