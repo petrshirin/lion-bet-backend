@@ -167,7 +167,7 @@ class UserPaymentApp(modules.DashboardModule):
 
 class AdminPaymentActionsApp(modules.DashboardModule):
     def is_empty(self):
-        return list(self.logs) == []
+        return False
 
     def __init__(self, **kwargs):
         super(AdminPaymentActionsApp, self).__init__(**kwargs)
