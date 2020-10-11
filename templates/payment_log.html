@@ -1,20 +1,13 @@
 {% extends "admin_tools/dashboard/module.html" %}
 {% block module_content %}
-    <div class="row">
-        <span>ID</span>  <span>Админ</span> <span>Сумма</span>
-    </div>
+    <table>
+    <tr class="row">
+        <td>ID</td>  <td>Админ</td> <td>Пользователь</td> <td>Сумма</td> <td>Дата</td>
+    </tr>
     {% for log in module.logs %}
-        <div class="row">
-            <span>{{ log.id }}</span>  <span>{{ log.admin }}</span> <span>{{ log.amount }}</span>
-        </div>
+        <tr class="row">
+            <td>{{ log.id }}</td>  <td><a href="{{ log.get_url_for_admin }}">{{ log.admin }}</a></td> <td><a href="{{ log.get_url_for_user }}">{{ log.user }}</a></td> <td>{{ log.amount }}</td>  <td>{{ log.date_created }}</td>
+        </tr>
     {% endfor %}
-    <style>
-        .row {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: start;
-            padding: 10px;
-        }
-    </style>
+    </table>
 {% endblock %}

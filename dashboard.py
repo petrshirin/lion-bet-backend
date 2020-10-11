@@ -38,6 +38,7 @@ class CustomIndexDashboard(Dashboard):
             display='tabs',
             children=[
                 UserStatApp(title=u'Статистика'),
+                TableStatApp(title='Метрики', stat_name='Пользователей', model='Client'),
                 modules.ModelList(
                     _('Данные'),
                     models=(
@@ -68,6 +69,7 @@ class CustomIndexDashboard(Dashboard):
             display='tabs',
             children=[
                 UserPaymentApp(title=u'Статистика'),
+                TableStatApp(title='Метрики', stat_name='Пополнений', model='UserMoneyRequest'),
                 modules.ModelList(
                     _('Все запросы'),
                     models=(
@@ -131,7 +133,7 @@ class UserStatApp(modules.DashboardModule):
 
     def __init__(self, **kwargs):
         super(UserStatApp, self).__init__(**kwargs)
-        self.template = 'user_stat.html'
+        self.template = 'graphics.html'
         qs = Client.objects.filter(activated=True)
         end = now()
         start = end - timedelta(days=30)
@@ -150,7 +152,7 @@ class UserPaymentApp(modules.DashboardModule):
 
     def __init__(self, **kwargs):
         super(UserPaymentApp, self).__init__(**kwargs)
-        self.template = 'user_stat.html'
+        self.template = 'graphics.html'
         qs = UserMoneyRequest.objects.filter(request_type='input')
         end = now()
         start = end - timedelta(days=30)
@@ -171,3 +173,24 @@ class AdminPaymentActionsApp(modules.DashboardModule):
         super(AdminPaymentActionsApp, self).__init__(**kwargs)
         self.template = 'payment_log.html'
         self.logs = AdminPaymentLog.objects.all()
+
+
+class TableStatApp(modules.DashboardModule):
+
+    def is_empty(self):
+        return False
+
+    def __init__(self, **kwargs):
+        super(TableStatApp, self).__init__(**kwargs)
+        self.template = 'table_stats.html'
+        self.stat_name = kwargs['stat_name']
+        if kwargs['model'] == 'Client':
+            self.per_day = Client.objects.filter(activated=True, date_register=now() - timedelta(hours=24)).count()
+            self.per_week = Client.objects.filter(activated=True, date_register=now() - timedelta(days=7)).count()
+            self.per_mouth = Client.objects.filter(activated=True, date_register=now() - timedelta(days=30)).count()
+            self.per_all = Client.objects.filter(activated=True).count()
+        elif kwargs['model'] == 'UserMoneyRequest':
+            self.per_day = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created=now() - timedelta(hours=24)).all().aggregate(Sum('amount'))['amount__sum'] or 0
+            self.per_week = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created=now() - timedelta(days=7)).all().aggregate(Sum('amount'))['amount__sum'] or 0
+            self.per_mouth = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created=now() - timedelta(days=30)).all().aggregate(Sum('amount'))['amount__sum'] or 0
+            self.per_all = UserMoneyRequest.objects.filter(accepted=True,  request_type='input').all().aggregate(Sum('amount'))['amount__sum'] or 0

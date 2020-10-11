@@ -33,7 +33,8 @@ class AdminPaymentLogMiddleware:
                 if old_balance is None:
                     return response
                 AdminPaymentLog.objects.create(admin=request.user,
-                                               amount=abs(float(request.POST['current_balance'])-float(old_balance)))
+                                               amount=abs(float(request.POST['current_balance'])-float(old_balance)),
+                                               user=user)
             except Exception as err:
                 LOG.error(err)
         return response

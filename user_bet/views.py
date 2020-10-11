@@ -12,7 +12,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def make_bet_view(request: Request, bet_type: str) -> Response:
 
@@ -28,8 +28,10 @@ def make_bet_view(request: Request, bet_type: str) -> Response:
 @permission_classes([IsAuthenticated])
 def find_bet_for_ticket_view(request: Request, ticket: str) -> Response:
     response = get_bet_on_ticket(request.user, ticket)
-    return Response(response, status=200)
-
+    if response.get('errors'):
+        return Response(response, status=400)
+    else:
+        return Response(response, status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

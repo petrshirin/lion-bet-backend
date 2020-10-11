@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save, post_init
 from django.dispatch import receiver
+from django.urls import reverse
 
 
 # Create your models here.
@@ -82,8 +83,16 @@ class UserEmail(models.Model):
 
 
 class AdminPaymentLog(models.Model):
-    admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='admin')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='user')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date_created = models.DateTimeField(default=now)
+
+    def get_url_for_user(self):
+        return reverse('admin:users_customeraccount_change', args=[self.user.customeraccount.id])
+
+    def get_url_for_admin(self):
+        return reverse('admin:auth_user_change', args=[self.admin.id])
 
 
 @receiver(post_save, sender=Client)

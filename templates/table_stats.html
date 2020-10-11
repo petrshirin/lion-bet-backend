@@ -1,0 +1,17 @@
+{% extends "admin_tools/dashboard/module.html" %}
+{% block module_content %}
+    <table>
+        <tr class="row">
+            <td>{{ module.stat_name }} за день</td> <td>{{ module.per_day }}</td>
+        </tr>
+        <tr class="row">
+            <td>{{ module.stat_name }} за неделю</td> <td>{{ module.per_week }}</td>
+        </tr>
+        <tr class="row">
+            <td>{{ module.stat_name }} за месяц</td> <td>{{ module.per_mouth }}</td>
+        </tr>
+        <tr class="row">
+            <td>{{ module.stat_name }} за время</td> <td>{{ module.per_all }}</td>
+        </tr>
+    </table>
+{% endblock %}

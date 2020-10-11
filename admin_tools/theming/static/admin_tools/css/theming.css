@@ -21,7 +21,8 @@
     margin: 0;
     padding: 5px 10px;
     text-indent: -9999px;
-    background: transparent url(../images/django.png) 10px 5px no-repeat;
+    background: #205067 url(../images/lion.svg) center no-repeat;
+    background-size: 50%;
     height: 31px;
     width: 93px;
 }

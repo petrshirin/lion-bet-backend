@@ -15,6 +15,7 @@ class CustomMenu(Menu):
     """
     Custom Menu for lion_bet_backend admin site.
     """
+
     def __init__(self, **kwargs):
         Menu.__init__(self, **kwargs)
         self.children += [
