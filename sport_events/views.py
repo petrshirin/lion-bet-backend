@@ -3,7 +3,7 @@ from rest_framework.views import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.request import Request
-from .services.line_events import get_line_sports, get_line_countries, get_line_tournaments, get_line_matches, get_list_of_tournaments_with_matches_line
+from .services.line_events import get_line_sports, get_line_countries, get_line_tournaments, get_line_matches, get_list_of_tournaments_with_matches_line, sport_results
 from .services.live_events import get_live_sports, get_live_countries, get_live_tournaments, get_live_matches, get_list_of_tournaments_with_matches_live
 
 
@@ -93,4 +93,13 @@ def tournaments_with_matches_live_view(request: Request, sport_id: int = 0, page
     tournaments_data = get_list_of_tournaments_with_matches_live(sport_id, page)
 
     return Response({'success': True, 'data': tournaments_data, 'length': len(tournaments_data)}, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def results_matches(request: Request, sport_id: int = 0, page: int = 0) -> Response:
+    response = sport_results(request, sport_id, page)
+    return Response({'success': True, 'data': response, 'length': len(response)})
+
+
 

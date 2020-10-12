@@ -1,7 +1,9 @@
 from django.urls import path, include
 from .views import sports_line_view, country_line_view, \
     tournaments_line_view, matches_line_view, \
-    tournaments_live_view, matches_live_view, sports_live_view, country_live_view, tournaments_with_matches_line_view, tournaments_with_matches_live_view
+    tournaments_live_view, matches_live_view, sports_live_view, \
+    country_live_view, tournaments_with_matches_line_view, \
+    tournaments_with_matches_live_view, results_matches
 
 
 urlpatterns = [
@@ -16,5 +18,6 @@ urlpatterns = [
     path('live/tournaments/list/<int:sport_id>', tournaments_with_matches_live_view),
     path('line/tournaments/list/<int:sport_id>', tournaments_with_matches_line_view),
     path('live/tournaments/list/<int:sport_id>/<int:page>', tournaments_with_matches_live_view),
-    path('line/tournaments/list/<int:sport_id>/<int:page>', tournaments_with_matches_line_view)
+    path('line/tournaments/list/<int:sport_id>/<int:page>', tournaments_with_matches_line_view),
+    path('results/<int:sport_id>/<int:page>', results_matches)
 ]

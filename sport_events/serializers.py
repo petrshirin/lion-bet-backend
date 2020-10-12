@@ -46,6 +46,17 @@ class MatchSerializer(serializers.ModelSerializer):
                   'tournament', 'score_full', 'score_period', 'period_name', 'events')
 
 
+class MatchWithoutEventsSerializer(serializers.ModelSerializer):
+    sport = SportSerializer()
+    tournament = TournamentSerializer()
+
+    class Meta:
+        model = Match
+        fields = ('game_num', 'name', 'name_en', 'game_start',
+                  'opp_1_name', 'opp_2_name', 'opp_1_id', 'opp_2_id', 'opp_1_icon', 'opp_2_icon',
+                  'sport', 'tournament', 'score_full', 'score_period', 'period_name')
+
+
 class SimpleMatchSerializer(serializers.ModelSerializer):
 
     events = MatchEventSerializer(many=True)
@@ -56,5 +67,5 @@ class SimpleMatchSerializer(serializers.ModelSerializer):
                   'opp_1_name', 'opp_2_name', 'opp_1_id', 'opp_2_id', 'opp_1_icon', 'opp_2_icon',
                   'score_full', 'score_period', 'period_name', 'events', 'sport')
 
-    sport = SportSerializer()
+
 

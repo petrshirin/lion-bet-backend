@@ -1,7 +1,8 @@
 from rest_framework.request import Request
 from rest_framework.utils.serializer_helpers import ReturnList
 from sport_events.betapi_wrapper import *
-from sport_events.serializers import SportSerializer, CountrySerializer, TournamentSerializer, MatchSerializer, SimpleMatchSerializer
+from sport_events.serializers import SportSerializer, CountrySerializer, \
+    TournamentSerializer, MatchSerializer, SimpleMatchSerializer, MatchWithoutEventsSerializer
 from django.db.models.query import Q
 from typing import List
 
@@ -82,3 +83,12 @@ def _generate_main_events(events: List):
         if event['oc_group_name'] == '1x2' or event['oc_group_name'] == 'Тотал':
             result.append(event)
     return result
+
+
+def sport_results(request: Request, sport_id: int = 0, page: int = 0) -> Dict:
+    if sport_id:
+        matches = Match.objects.filter(deleted=False, ended=True, sport_id=sport_id).all()
+    else:
+        matches = Match.objects.filter(deleted=False, ended=True).all()
+
+    return MatchWithoutEventsSerializer(matches, many=True).data[page*20:page*20+20]
