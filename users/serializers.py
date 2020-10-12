@@ -22,6 +22,8 @@ class CustomerAccountSerializer(serializers.ModelSerializer):
 
 class ClientRegisterSerializer(serializers.ModelSerializer):
 
+    date_birth = serializers.DateField(input_formats=['%d.%m.%Y'])
+
     class Meta:
         model = Client
         fields = ('first_name', 'second_name', 'email',

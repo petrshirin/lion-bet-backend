@@ -2,16 +2,21 @@
 {% block module_content %}
 <ul>
     {% spaceless %}
+        <table>
     {% for child in module.children %}
-    <li class="{% cycle 'odd' 'even' %}">
-        <span class="float-right">{{ child.action_time|date }}</span>
+    <tr class="{% cycle 'odd' 'even' %}">
+        <td>
         {% if child.is_deletion %}
         <span class="deletelink">{% if child.content_type %}{% filter capfirst %}{{ child.content_type.name }}{% endfilter %}&nbsp;{% endif %}{{ child.object_repr }}</span>
         {% else %}
         <a href="{{ child.get_admin_url }}" class="{% if child.is_addition %} addlink{% endif %}{% if child.is_change %} changelink{% endif %}">{% if child.content_type %}{% filter capfirst %}{{ child.content_type.name }}{% endfilter %}&nbsp;{% endif %}{{ child.object_repr }}</a>
         {% endif %}
-    </li>
+        </td>
+        <td><span class="float-right">{{ child.action_time }}</span></td>
+        <td><a class="grp-float-left" href="{% url 'admin:auth_user_change' child.user_id %}">{{ child.user }}</a></td>
+    </tr>
     {% endfor %}
+        </table>
     {% endspaceless %}
 </ul>
 {% endblock %}

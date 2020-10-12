@@ -16,10 +16,8 @@ from envparse import env
 
 env.read_envfile('.env')
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -34,7 +32,6 @@ SERVER = bool(int(os.environ['SERVER']))
 ALLOWED_HOSTS = ['127.0.0.1', 'api.royal-lion.bet']
 
 SITE_ID = 1
-
 
 # Application definition
 
@@ -105,7 +102,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lion_bet_backend.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -119,16 +115,15 @@ if DEBUG or SERVER:
     }
 else:
     DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                'NAME': os.environ['DB_NAME'],
-                'USER': os.environ['DB_USER'],
-                'PASSWORD': os.environ['DB_PASS'],
-                'HOST': os.environ['DB_HOST'],
-                'PORT': os.environ['DB_PORT'],
-            }
-         }
-
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['DB_NAME'],
+            'USER': os.environ['DB_USER'],
+            'PASSWORD': os.environ['DB_PASS'],
+            'HOST': os.environ['DB_HOST'],
+            'PORT': os.environ['DB_PORT'],
+        }
+    }
 
 # Logining
 
@@ -162,7 +157,6 @@ else:
         },
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -181,7 +175,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -195,7 +188,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Rest Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -207,6 +199,15 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 
+
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
 
 # CORS settings
 CORS_REPLACE_HTTPS_REFERER = True
@@ -239,16 +240,13 @@ CORS_ALLOW_HEADERS = [
 
 ]
 
-
 # Celery
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 
-
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 
 # betAPI
 BET_API_HOST = os.environ.get('BET_API_HOST')
@@ -261,7 +259,7 @@ MAKE_BET_PARTNER_ID = os.environ.get('MAKE_BET_PARTNER_ID')
 GO_BET_EMAIL = "example@google.com"
 GO_BET_PASSWORD = "1233"
 
-#if DEBUG and not SERVER:
+# if DEBUG and not SERVER:
 #    STATICFILES_DIRS = (
 #         os.path.join(BASE_DIR, 'static'),
 #    )
@@ -269,20 +267,16 @@ GO_BET_PASSWORD = "1233"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
 # SMTP settings
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
-EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_USE_TLS = True
 DEFAULT_EMAIL = "mail@lionbet.com"
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_FILE_PATH = "./tmp/mails"
 
 # QIWI settings
 QIWI_PUBLIC_KEY = os.environ["QIWI_PUBLIC_KEY"]
-
 
 # Admin
 ADMIN_TOOLS_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'

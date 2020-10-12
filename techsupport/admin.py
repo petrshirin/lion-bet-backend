@@ -10,7 +10,7 @@ admin.site.register(Department)
 
 @admin.register(ClientRequest)
 class ClientRequestAdmin(admin.ModelAdmin):
-    list_display = ("number", "department", "view_client", 'closed')
+    list_display = ("number", "department", "view_client", 'request', 'closed')
     list_filter = ("closed", 'department', 'user__client')
 
     def view_client(self, obj: ClientRequest):

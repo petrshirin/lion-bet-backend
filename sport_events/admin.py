@@ -27,7 +27,7 @@ class TournamentAdmin(admin.ModelAdmin):
 class MatchAdmin(admin.ModelAdmin):
     list_display = ('game_num', 'name', 'sport', 'tournament', 'game_start', 'admin_created', 'deleted')
     list_filter = ('sport', 'deleted', 'game_start', 'admin_created')
-    search_fields = ('name__startswith', 'sport__name__startswith')
+    search_fields = ('opp_1_name__startswith', 'opp_2_name__startswith', 'name__startswith', 'sport__name__startswith')
 
 
 @admin.register(MatchAdminResult)

@@ -306,6 +306,7 @@ class MatchWrapper(BetApiWrapper):
                                                              game_id=match.get('game_id'),
                                                              sport=sport,
                                                              tournament=tor,
+                                                             name=f"{match.get('opp_1_name')} - {match.get('opp_2_name')}",
                                                              game_start=datetime.fromtimestamp(match.get('game_start'), tz=tz),
                                                              opp_1_name=match.get('opp_1_name'),
                                                              opp_2_name=match.get('opp_2_name'),
