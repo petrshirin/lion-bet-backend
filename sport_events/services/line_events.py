@@ -71,13 +71,14 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
         matches = []
         for match in matches_ser.data:
             tmp_match = dict(match)
-            tmp_match['main_events'] = _generate_main_events(match['events'])
-        tmp_data['matches'] = matches_ser.data
+            tmp_match['main_events'] = generate_main_events(match['events'])
+            matches.append(tmp_match)
+        tmp_data['matches'] = matches
         data.append(tmp_data)
     return data[page*10:page*10+10]
 
 
-def _generate_main_events(events: List):
+def generate_main_events(events: List):
     result = []
     for event in events:
         if event['oc_group_name'] == '1x2' or event['oc_group_name'] == 'Тотал':

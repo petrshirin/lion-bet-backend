@@ -2,6 +2,7 @@ from rest_framework.utils.serializer_helpers import ReturnList
 from sport_events.betapi_wrapper import *
 from sport_events.serializers import TournamentSerializer, MatchSerializer, SportSerializer, CountrySerializer, SimpleMatchSerializer
 from django.db.models.query import Q
+from .line_events import generate_main_events
 from typing import List
 
 
@@ -66,6 +67,11 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
         matches_ser = SimpleMatchSerializer(matches, many=True)
         tournament_ser = TournamentSerializer(tournament)
         tmp_data = dict(tournament_ser.data)
-        tmp_data['matches'] = matches_ser.data
+        matches = []
+        for match in matches_ser.data:
+            tmp_match = dict(match)
+            tmp_match['main_events'] = generate_main_events(match['events'])
+            matches.append(tmp_match)
+        tmp_data['matches'] = matches
         data.append(tmp_data)
     return data[page*10:page*10+10]
