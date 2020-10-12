@@ -128,7 +128,7 @@ def _save_bet_to_db(user: User, new_bet: Dict, bet_type: str, amount: float) -> 
     try:
         new_model_bet = UserBet.objects.create(user=user,
                                                bet_type=bet_type,
-                                               bet_code=new_bet.get('bet_code'),
+                                               bet_code=new_bet['d']['BetHeadDetail']['BetCode'],
                                                win_coefficient=new_bet['d']['BetHeadDetail']['Coef'],
                                                user_bet=amount,
                                                user_win=new_bet['d']['BetHeadDetail']['PosWin'])
