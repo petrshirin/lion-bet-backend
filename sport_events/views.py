@@ -83,7 +83,7 @@ def tournaments_with_matches_line_view(request: Request, sport_id: int = 0, page
 
     tournaments_data = get_list_of_tournaments_with_matches_line(sport_id, page)
 
-    return Response({'success': True, 'data': tournaments_data}, status=200)
+    return Response({'success': True, 'data': tournaments_data, 'length': len(tournaments_data)}, status=200)
 
 
 @api_view(['GET'])
@@ -92,5 +92,5 @@ def tournaments_with_matches_live_view(request: Request, sport_id: int = 0, page
 
     tournaments_data = get_list_of_tournaments_with_matches_live(sport_id, page)
 
-    return Response({'success': True, 'data': tournaments_data}, status=200)
+    return Response({'success': True, 'data': tournaments_data, 'length': len(tournaments_data)}, status=200)
 
