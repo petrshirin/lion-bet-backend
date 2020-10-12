@@ -71,7 +71,7 @@ def make_bet(request: Request, bet_type: str) -> Dict:
         new_model_bet.delete()
         return {"errors": f"Ошибка при создании ставки, Ошибка в ивентах", 'success': False}
     bet_ser = UserBetSerializers(new_model_bet)
-    request.user.customeraccount.current_balance -= new_model_bet.user_bet
+    request.user.customeraccount.current_balance = float(request.user.customeraccount.current_balance) - float(new_model_bet.user_bet)
     request.user.customeraccount.save()
     return {"data": bet_ser.data, "success": True}
 
