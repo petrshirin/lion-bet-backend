@@ -22,9 +22,11 @@ def make_bet(request: Request, bet_type: str) -> Dict:
 
     if validated_data.get('errors'):
         return validated_data
-    else:
-        events = bet_ids_to_models(validated_data['bets_ids'])
-        amount = validated_data['amount']
+
+    events = bet_ids_to_models(validated_data['bets_ids'])
+    amount = validated_data['amount']
+    if events is None:
+        return {'errors': "Неверный ID Ставки", 'success': False}
 
     if check_admin_bet(events):
         if len(events) == 1:
@@ -61,7 +63,7 @@ def make_bet(request: Request, bet_type: str) -> Dict:
         return {"errors": "Неизвестная ошибка при создании ставки", 'success': False}
     if new_bet.get('errorCode'):
         return {"errors": f"Ошибка при создании ставки {new_bet.get('errorMessage')}", 'success': False}
-    new_model_bet = _save_bet_to_db(request.data, new_bet, bet_type, amount)
+    new_model_bet = _save_bet_to_db(request.user, new_bet, bet_type, amount)
     if not new_model_bet:
         return {"errors": f"Ошибка при создании ставки {new_bet.get('errorMessage')}", 'success': False}
     model_bet = _add_to_model_events(new_model_bet, events)
