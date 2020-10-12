@@ -48,7 +48,7 @@ def make_bet(request: Request, bet_type: str) -> Dict:
         else:
             return {"errors": f"Одна или несколько ставок недоступны, для экспресса", 'success': False}
 
-    if not check_user_balance(request.user, amount):
+    if not check_balance(request.user, amount):
         return {"errors": "Недостаточно средств для совершения операции", 'success': False}
 
     list_bets = _create_list_bets(events, bet_type)
