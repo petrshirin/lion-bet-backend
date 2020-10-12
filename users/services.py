@@ -185,8 +185,8 @@ def user_forgot_password(request: Request) -> Dict:
     new_email.generate_code()
     new_email.is_view = True
     new_email.save()
-    request.user.set_password(new_password)
-    request.user.save()
+    client.user.set_password(new_password)
+    client.user.save()
     return {"data": {'email': client.email}, 'success': True}
 
 
