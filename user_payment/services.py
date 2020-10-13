@@ -36,7 +36,8 @@ def make_output_request(request: Request) -> Dict:
                 return {"errors": "Недостаточное количество пополнений для вывода", "success": False}
             if not check_balance(request.user, amount):
                 return {"errors": "Недостаточно средств для вывода", 'success': False}
-            UserMoneyRequest.objects.create(user=request.user, amount=amount, request_type='output')
+            UserMoneyRequest.objects.create(user=request.user, amount=amount,
+                                            request_type='output', method=request.data.get('method', None))
             return {"data": 'ok', "success": True}
         except ValueError as e:
             LOG.error(e)

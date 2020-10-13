@@ -56,6 +56,7 @@ class MatchEvent(models.Model):
     oc_name = models.CharField(max_length=255, verbose_name=u'Название исхода')
     oc_rate = models.DecimalField(max_digits=9, decimal_places=2, verbose_name=u'Коэффициент')
     oc_pointer = models.CharField(max_length=100, verbose_name=u'Поинтер для API')
+    short_name = models.CharField(max_length=15, default=None, null=True)
     deleted = models.BooleanField(default=False, verbose_name=u'Удален')
     admin_created = models.BooleanField(default=False, verbose_name=u'Создан админом')
 

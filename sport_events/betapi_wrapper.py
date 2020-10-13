@@ -327,11 +327,16 @@ class MatchWrapper(BetApiWrapper):
                             continue
 
                         for event in match.get('game_oc_list'):
-                            new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
-                                                                  oc_name=event['oc_name'],
-                                                                  oc_rate=event['oc_rate'],
-                                                                  oc_pointer=event['oc_pointer'])
-                            new_match.events.add(new_event)
+                            short_name = self.generate_short_name(event['oc_group_name'],
+                                                                  event['oc_name'],
+                                                                  new_match)
+                            if short_name:
+                                new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
+                                                                      oc_name=event['oc_name'],
+                                                                      oc_rate=event['oc_rate'],
+                                                                      oc_pointer=event['oc_pointer'],
+                                                                      short_name=short_name)
+                                new_match.events.add(new_event)
                         LOG.info(f'{new_match.game_num}, events: {new_match.events.count()}')
 
                     else:
@@ -341,6 +346,65 @@ class MatchWrapper(BetApiWrapper):
                         old_match.request_type = self.request_type
                         old_match.ended = bool(match.get('finale'))
                         old_match.save()
+
+    @staticmethod
+    def generate_short_name(oc_group: str, oc_name: str, match: Match) -> Union[str, None]:
+        if oc_group == '1x2':
+            if match.opp_1_name == oc_name:
+                return 'П1'
+            elif match.opp_2_name == oc_name:
+                return 'П2'
+            else:
+                return 'X'
+        elif oc_group.lower() == 'тотал':
+            split_line = oc_name.split(' ')
+            if 'меньше' in oc_name.lower():
+                return f'ТМ {split_line[1]}'
+            elif 'больше' in oc_name.lower():
+                return f'ТБ {split_line[1]}'
+
+        elif oc_group == '"Индивидуальный тотал 1-го':
+            split_line = oc_name.split(' ')
+            if 'меньше' in oc_name.lower():
+                return f'ИТМ1 {split_line[-1]}'
+            elif 'больше' in oc_name.lower():
+                return f'ИТБ1 {split_line[-1]}'
+            else:
+                return None
+        elif oc_group == '"Индивидуальный тотал 2-го':
+            split_line = oc_name.split(' ')
+            if 'меньше' in oc_name.lower():
+                return f'ИТМ2 {split_line[-1]}'
+            elif 'больше' in oc_name.lower():
+                return f'ИТБ2 {split_line[-1]}'
+            else:
+                return None
+        elif oc_group == 'Фора':
+            split_line = oc_name.split(' ')
+            if match.opp_1_name in oc_name:
+                return f'Ф {split_line[-1]}'
+            elif match.opp_2_name in oc_name:
+                return f'Ф {split_line[-1]}'
+            else:
+                return None
+        elif oc_group == 'Двойной шанс':
+            if match.opp_1_name in oc_name and match.opp_2_name in oc_name:
+                return f'12'
+            elif match.opp_1_name in oc_name:
+                return f'1X'
+            elif match.opp_2_name in oc_name:
+                return f'2X'
+            else:
+                return None
+        elif oc_group == 'Обе забьют':
+            if match.opp_1_name in oc_name:
+                return f'КОМ1'
+            elif match.opp_2_name in oc_name:
+                return f'КОМ2'
+            else:
+                return None
+        else:
+            return None
 
 
 class CurrentMatchWrapper(BetApiWrapper):
@@ -381,3 +445,5 @@ class CurrentMatchWrapper(BetApiWrapper):
                     match.save()
                 except Match.DoesNotExist:
                     return
+
+
