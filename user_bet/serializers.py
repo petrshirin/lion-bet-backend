@@ -5,7 +5,7 @@ from sport_events.serializers import MatchEvent, MatchWithoutEventsSerializer
 
 class MatchEventWithMatchSerializer(serializers.ModelSerializer):
 
-    match_list = MatchWithoutEventsSerializer(many=True, read_only=True, source='match_set')
+    match_list = MatchWithoutEventsSerializer(read_only=True, source='match_set')
 
     class Meta:
         model = MatchEvent
