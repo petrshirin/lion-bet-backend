@@ -101,7 +101,7 @@ def _create_bet_str(event: MatchEvent, bet_type: str) -> str:
 
 def _validate_bet_request_data(data: Request.data) -> Dict:
 
-    if data.get('bets_ids'):
+    if data.get('bets_ids') and isinstance(data.get('bets_ids'), list):
         bets_ids = data.get('bets_ids')
     else:
         return {"errors": "Список id не существует или пустой", 'success': False}
