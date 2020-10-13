@@ -91,6 +91,7 @@ class GoBetWrapper(object):
                 "rate_mode": rate_mode
             }
         }
+        LOG.debug(data)
         response = requests.post(f"{self.url}/bet/place/", json=data, cookies=self.cookies)
 
         if response.ok:
