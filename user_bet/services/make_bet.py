@@ -13,6 +13,13 @@ import string
 LOG = logging.getLogger(__name__)
 
 
+ERROR_RU = {
+    '|error_exist_bet|': 'Такого исхода больше нет',
+    '|error_repeat_bet_data|': 'Ставки из одного матча на разные ивенты',
+    '|error_block_bet_data|': 'На данный момент ставка временно заблокирована для приема.'
+}
+
+
 def make_bet(request: Request, bet_type: str) -> Dict:
     validated_data = _validate_bet_request_data(request.data)
 
@@ -62,10 +69,10 @@ def make_bet(request: Request, bet_type: str) -> Dict:
     if not new_bet:
         return {"errors": "Неизвестная ошибка при создании ставки", 'success': False}
     if new_bet.get('errorCode'):
-        return {"errors": f"Ошибка при создании ставки {new_bet.get('errorMessage')}", 'success': False}
+        return {"errors": f"Ошибка при создании ставки {ERROR_RU.get(new_bet.get('errorMessage'))}", 'success': False}
     new_model_bet = _save_bet_to_db(request.user, new_bet, bet_type, amount)
     if not new_model_bet:
-        return {"errors": f"Ошибка при создании ставки {new_bet.get('errorMessage')}", 'success': False}
+        return {"errors": f"Ошибка при создании ставки {ERROR_RU.get(new_bet.get('errorMessage'))}", 'success': False}
     model_bet = _add_to_model_events(new_model_bet, events)
     if not model_bet:
         new_model_bet.delete()
