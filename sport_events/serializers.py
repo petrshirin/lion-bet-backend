@@ -31,7 +31,7 @@ class MatchEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MatchEvent
-        fields = ('id', 'oc_group_name', 'oc_name', 'oc_rate', 'oc_pointer')
+        fields = ('id', 'oc_group_name', 'oc_name', 'oc_rate', 'oc_pointer', 'short_name')
 
 
 class MatchSerializer(serializers.ModelSerializer):
