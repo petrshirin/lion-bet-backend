@@ -297,7 +297,7 @@ class MatchWrapper(BetApiWrapper):
                 return
             for tournament in items['body']:
                 for match in tournament['events_list']:
-                    old_match = Match.objects.filter(game_num=match.get('game_num')).first()
+                    old_match = Match.objects.filter(game_id=match.get('game_id')).first()
                     if not old_match:
                         try:
                             sport = Sport.objects.get(api_id=match.get('sport_id'))
