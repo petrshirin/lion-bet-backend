@@ -69,11 +69,11 @@ def close_matches():
 def close_results_for_admin_matches():
     matches = Match.objects.filter(deleted=False, ended=False, admin_created=True, game_start__lte=now()).all()
     for match in matches:
-        match.ended = True
-        match.save()
-        result = MatchAdminResult.objects.filter(match=match).first()
+        result = MatchAdminResult.objects.filter(match=match, date_closed__lte=now()).first()
         if not result:
             continue
+        match.ended = True
+        match.save()
         for event in match.events.all():
             user_bets = UserBet.objects.filter(events__in=event).all()
             result = MatchAdminResult.objects.filter(match=match).first()
@@ -91,16 +91,17 @@ def close_results_for_admin_matches():
                             command_winner = 'Ничья'
                         if user_event.oc_name == command_winner:
                             user_bet.user.customeraccount.current_balance += user_bet.user_win
+                            user_bet.is_went = True
                         else:
                             user_bet.user.customeraccount.current_balance -= user_bet.user_bet
                     else:
                         user_event = user_bet.events.first()
                         if result.total in user_event.oc_name:
                             user_bet.user.customeraccount.current_balance += user_bet.user_win
+                            user_bet.is_went = True
                         else:
                             user_bet.user.customeraccount.current_balance -= user_bet.user_win
 
-                    user_bet.is_went = True
                     user_bet.save()
                     user_bet.user.customeraccount.save()
 
