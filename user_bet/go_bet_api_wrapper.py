@@ -99,6 +99,7 @@ class GoBetWrapper(object):
                 start_json = response.text.find('{')
                 result = json.loads(response.text[start_json:])
                 if result['errorCode']:
+                    LOG.error(data)
                     LOG.error(f"make bet error: {result['fullErrorCode']} {result['errorMessage']}")
                 return result
             except JSONDecodeError as err:
