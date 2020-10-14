@@ -52,7 +52,7 @@ def get_line_matches(tournament_id: int = None, count: int = None) -> ReturnList
     return MatchSerializer(matches, many=True).data
 
 
-def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) -> List:
+def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) -> Tuple[List, int]:
     if sport_id:
         live_query_t = Q(request_type='line', deleted=False, sport__api_id=sport_id)
     else:
@@ -75,7 +75,7 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
             matches.append(tmp_match)
         tmp_data['matches'] = matches
         data.append(tmp_data)
-    return data[page*10:page*10+10]
+    return data[page*10:page*10+10], len(data )
 
 
 def split_events(events: List) -> Tuple[list, list]:
@@ -89,10 +89,12 @@ def split_events(events: List) -> Tuple[list, list]:
     return main_events, additional_events
 
 
-def sport_results(request: Request, sport_id: int = 0, page: int = 0) -> Dict:
+def sport_results(request: Request, sport_id: int = 0, page: int = 0) -> Tuple[ReturnList, int]:
     if sport_id:
         matches = Match.objects.filter(deleted=False, ended=True, sport_id=sport_id).all()
     else:
         matches = Match.objects.filter(deleted=False, ended=True).all()
 
-    return MatchWithoutEventsSerializer(matches, many=True).data[page*20:page*20+20]
+    data = MatchWithoutEventsSerializer(matches, many=True).data
+
+    return data[page*20:page*20+20], len(data)

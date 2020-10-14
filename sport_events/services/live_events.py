@@ -3,7 +3,7 @@ from sport_events.betapi_wrapper import *
 from sport_events.serializers import TournamentSerializer, MatchSerializer, SportSerializer, CountrySerializer, SimpleMatchSerializer
 from django.db.models.query import Q
 from .line_events import split_events
-from typing import List
+from typing import List, Tuple
 
 
 def get_live_sports() -> ReturnList:
@@ -51,7 +51,7 @@ def get_live_matches(tournament_id: int = None, count: int = None) -> ReturnList
     return MatchSerializer(matches, many=True).data
 
 
-def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) -> List:
+def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) -> Tuple[List, int]:
     if sport_id:
         live_query_t = Q(request_type='live', deleted=False, sport__api_id=sport_id)
     else:
@@ -74,4 +74,4 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
             matches.append(tmp_match)
         tmp_data['matches'] = matches
         data.append(tmp_data)
-    return data[page*10:page*10+10]
+    return data[page*10:page*10+10], len(data)

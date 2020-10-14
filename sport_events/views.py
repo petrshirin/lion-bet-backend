@@ -81,25 +81,25 @@ def matches_live_view(request: Request, tournament_id: int = None, count: int = 
 @permission_classes([AllowAny])
 def tournaments_with_matches_line_view(request: Request, sport_id: int = 0, page: int = 0) -> Response:
 
-    tournaments_data = get_list_of_tournaments_with_matches_line(sport_id, page)
+    tournaments_data, length = get_list_of_tournaments_with_matches_line(sport_id, page)
 
-    return Response({'success': True, 'data': tournaments_data, 'length': len(tournaments_data)}, status=200)
+    return Response({'success': True, 'data': tournaments_data, 'length': length}, status=200)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def tournaments_with_matches_live_view(request: Request, sport_id: int = 0, page: int = 0) -> Response:
 
-    tournaments_data = get_list_of_tournaments_with_matches_live(sport_id, page)
+    tournaments_data, length = get_list_of_tournaments_with_matches_live(sport_id, page)
 
-    return Response({'success': True, 'data': tournaments_data, 'length': len(tournaments_data)}, status=200)
+    return Response({'success': True, 'data': tournaments_data, 'length': length}, status=200)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def results_matches(request: Request, sport_id: int = 0, page: int = 0) -> Response:
-    response = sport_results(request, sport_id, page)
-    return Response({'success': True, 'data': response, 'length': len(response)})
+    response, length = sport_results(request, sport_id, page)
+    return Response({'success': True, 'data': response, 'length': length})
 
 
 
