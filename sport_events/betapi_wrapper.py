@@ -400,9 +400,9 @@ class MatchWrapper(BetApiWrapper):
                 return None
         elif oc_group.lower() == 'обе забьют':
             if 'Да' in oc_name:
-                return f'ОЗ - Да'
+                return f'Да'
             elif 'Нет' in oc_name:
-                return f'ОЗ - Нет'
+                return f'Нет'
             else:
                 return None
         else:
