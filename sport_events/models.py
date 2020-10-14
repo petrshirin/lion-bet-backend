@@ -74,7 +74,7 @@ class MatchEvent(models.Model):
 class Match(models.Model):
     game_num = models.IntegerField(verbose_name=u'Номер игры', unique=True)
     game_id = models.IntegerField(verbose_name=u'Id', unique=True)
-    uniq = models.CharField(max_length=100)
+    uniq = models.CharField(max_length=100, null=True, unique=True)
     name = models.CharField(max_length=255, verbose_name=u'Название')
     name_en = models.CharField(max_length=255, verbose_name=u'Название на английском')
     game_start = models.DateTimeField(verbose_name=u'Дата начала')
