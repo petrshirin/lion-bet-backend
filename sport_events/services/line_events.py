@@ -53,6 +53,7 @@ def get_line_matches(tournament_id: int = None, count: int = None) -> ReturnList
 
 
 def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) -> Tuple[List, int]:
+    page = page-1
     if sport_id:
         live_query_t = Q(request_type='line', deleted=False, sport__api_id=sport_id)
     else:
