@@ -331,6 +331,7 @@ class MatchWrapper(BetApiWrapper):
                             short_name = self.generate_short_name(event['oc_group_name'],
                                                                   event['oc_name'],
                                                                   new_match)
+                            LOG.error(event['oc_group_name'], event['oc_name'], short_name)
                             if short_name:
                                 new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
                                                                       oc_name=event['oc_name'],
@@ -382,7 +383,7 @@ class MatchWrapper(BetApiWrapper):
                 return f'ИТБ2 {split_line[-1]}'
             else:
                 return None
-        elif oc_group == 'Фора':
+        elif oc_group.lower() == 'фора':
             split_line = oc_name.split(' ')
             if match.opp_1_name in oc_name:
                 return f'Ф {split_line[-1]}'
@@ -390,7 +391,7 @@ class MatchWrapper(BetApiWrapper):
                 return f'Ф {split_line[-1]}'
             else:
                 return None
-        elif oc_group == 'Двойной шанс':
+        elif oc_group.lower() == 'двойной шанс':
             if match.opp_1_name in oc_name and match.opp_2_name in oc_name:
                 return f'12'
             elif match.opp_1_name in oc_name:
