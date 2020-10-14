@@ -297,13 +297,14 @@ class MatchWrapper(BetApiWrapper):
                 return
             for tournament in items['body']:
                 for match in tournament['events_list']:
-                    old_match = Match.objects.filter(game_id=match.get('game_id')).first()
+                    old_match = Match.objects.filter(uniq=match.get('uniq')).first()
                     if not old_match:
                         try:
                             sport = Sport.objects.get(api_id=match.get('sport_id'))
                             tor = Tournament.objects.get(api_id=match.get('tournament_id'))
                             new_match = Match.objects.create(game_num=match.get('game_num'),
                                                              game_id=match.get('game_id'),
+                                                             uniq=match.get('uniq'),
                                                              sport=sport,
                                                              tournament=tor,
                                                              name=f"{match.get('opp_1_name')} - {match.get('opp_2_name')}",
@@ -340,6 +341,8 @@ class MatchWrapper(BetApiWrapper):
                         LOG.info(f'{new_match.game_num}, events: {new_match.events.count()}')
 
                     else:
+                        old_match.game_num = match.get('game_num')
+                        old_match.game_id = match.get('game_id')
                         old_match.score_full = match.get('score_full')
                         old_match.score_period = match.get('score_period')
                         old_match.period_name = match.get('period_name')
