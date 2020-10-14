@@ -6,6 +6,7 @@ from rest_framework.request import Request
 from .models import *
 from .qiwi_wrapper import QiwiWrapper
 from user_bet.services.make_bet import check_balance
+from .serializers import UserMoneyRequestSerializer
 
 LOG = logging.getLogger(__name__)
 
@@ -47,3 +48,9 @@ def make_output_request(request: Request) -> Dict:
             return {"errors": "Не удалось создать запрос, обратитесь к администратору", "success": False}
     else:
         return {"errors": "Сумма не указана", "success": False}
+
+
+def user_output_requests(user: User) -> Dict:
+    user_requests = UserMoneyRequest.objects.filter(request_type='output', user=user).all()
+    user_requests_ser = UserMoneyRequestSerializer(user_requests, many=True)
+    return {"data": user_requests_ser.data, "success": True}
