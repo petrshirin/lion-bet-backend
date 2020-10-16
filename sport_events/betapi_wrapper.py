@@ -437,7 +437,7 @@ class CurrentMatchWrapper(BetApiWrapper):
 
     def close_current_match(self) -> None:
         resp = self._do_request()
-        LOG.info(resp)
+        print(resp)
         if resp:
             if isinstance(resp['body'], str):
                 LOG.error(f"{resp['body']} {datetime.utcnow()}")
@@ -451,6 +451,7 @@ class CurrentMatchWrapper(BetApiWrapper):
                     match.ended = True
                     match.save()
                 except Match.DoesNotExist:
+                    LOG.error(f"{self.uniq, self.game_id}")
                     return
 
 
