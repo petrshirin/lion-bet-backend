@@ -58,7 +58,7 @@ def update_matches_live():
 def close_matches():
     for match in Match.objects.filter(deleted=False, ended=False, admin_created=False, game_start__lte=now()).all():
         current_match_api = CurrentMatchWrapper(game_id=match.game_num, uniq=match.uniq)
-        current_match_api.close_current_match()
+        current_match_api.close_current_match(match)
 
 
 @app.task
