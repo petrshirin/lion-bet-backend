@@ -328,7 +328,8 @@ class MatchWrapper(BetApiWrapper):
                             LOG.error(f"TOURNAMENT_ID: {match.get('tournament_id')}")
                             continue
                         except IntegrityError:
-                            LOG.error(f"Not unique match {match.get('uniq')}")
+                            LOG.error(f"Not unique match {match.get('uniq')} {old_match}")
+                            continue
 
                         for event in match.get('game_oc_list'):
 
