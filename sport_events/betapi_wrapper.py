@@ -437,11 +437,11 @@ class CurrentMatchWrapper(BetApiWrapper):
 
     def close_current_match(self) -> None:
         resp = self._do_request()
-        print(resp)
         if resp:
             if isinstance(resp['body'], str):
                 LOG.error(f"{resp['body']} {datetime.utcnow()}")
                 return
+            print(resp['body'] == [] or resp['body'].get('finale', False) is True)
             if resp['body'] == [] or resp['body'].get('finale', False) is True:
                 try:
                     if self.uniq:
