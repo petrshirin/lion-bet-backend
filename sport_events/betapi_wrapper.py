@@ -349,6 +349,7 @@ class MatchWrapper(BetApiWrapper):
                         old_match.score_period = match.get('score_period')
                         old_match.period_name = match.get('period_name')
                         old_match.request_type = self.request_type
+                        old_match.game_start = datetime.fromtimestamp(match.get('game_start'), tz=tz)
                         old_match.ended = bool(match.get('finale'))
                         old_match.save()
 
