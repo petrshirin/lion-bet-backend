@@ -437,6 +437,7 @@ class CurrentMatchWrapper(BetApiWrapper):
 
     def close_current_match(self) -> None:
         resp = self._do_request()
+        LOG.info(resp)
         if resp:
             if isinstance(resp['body'], str):
                 LOG.error(f"{resp['body']} {datetime.utcnow()}")
