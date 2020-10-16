@@ -57,7 +57,7 @@ def update_matches_live():
 @app.task
 def close_matches():
     for match in Match.objects.filter(deleted=False, ended=False, admin_created=False):
-        current_match_api = CurrentMatchWrapper(game_id=match.game_num)
+        current_match_api = CurrentMatchWrapper(game_id=match.game_num, uniq=match.uniq)
         current_match_api.close_current_match()
 
 
@@ -84,11 +84,12 @@ def close_results_for_admin_matches():
                         elif result.winner == 'П2':
                             command_winner = match.opp_1_name
                         else:
-                            command_winner = 'Ничья'
+                            command_winner = 'X'
                         if user_event.oc_name == command_winner:
                             user_bet.user.customeraccount.current_balance += user_bet.user_win
                             user_bet.is_went = True
                         else:
+                            user_bet.is_went = False
                             user_bet.user.customeraccount.current_balance -= user_bet.user_bet
                     else:
                         user_event = user_bet.events.first()
@@ -96,6 +97,7 @@ def close_results_for_admin_matches():
                             user_bet.user.customeraccount.current_balance += user_bet.user_win
                             user_bet.is_went = True
                         else:
+                            user_bet.is_went = False
                             user_bet.user.customeraccount.current_balance -= user_bet.user_win
 
                     user_bet.save()

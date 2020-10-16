@@ -413,7 +413,7 @@ class CurrentMatchWrapper(BetApiWrapper):
 
     def __init__(self,
                  request_type: str = 'line',
-                 lang: str = 'ru', game_id: int = None):
+                 lang: str = 'ru', game_id: int = None, uniq: str = None):
         """
         get all countries of some sport and some country
         :param request_type:
@@ -422,6 +422,7 @@ class CurrentMatchWrapper(BetApiWrapper):
         """
         super(CurrentMatchWrapper, self).__init__(request_type, lang)
         self.game_id = game_id
+        self.uniq = uniq
 
     def _do_request(self) -> Union[Dict, None]:
         """
@@ -442,7 +443,10 @@ class CurrentMatchWrapper(BetApiWrapper):
                 return
             if resp['body'] == [] or resp['body'].get('finale', False) is True:
                 try:
-                    match = Match.objects.get(game_id=self.game_id)
+                    if self.uniq:
+                        match = Match.objects.get(uniq=self.uniq)
+                    else:
+                        match = Match.objects.get(game_id=self.game_id)
                     match.ended = True
                     match.save()
                 except Match.DoesNotExist:

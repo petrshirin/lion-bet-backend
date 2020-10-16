@@ -1,5 +1,7 @@
 from django.db import models
 from random import randint
+from django.db.models.signals import post_save, post_init
+from django.dispatch import receiver
 
 
 # Create your models here.
@@ -72,8 +74,8 @@ class MatchEvent(models.Model):
 
 
 class Match(models.Model):
-    game_num = models.IntegerField(verbose_name=u'Номер игры')
-    game_id = models.IntegerField(verbose_name=u'Id')
+    game_num = models.IntegerField(verbose_name=u'Номер игры', null=True)
+    game_id = models.IntegerField(verbose_name=u'Id', null=True)
     uniq = models.CharField(max_length=100, null=True, unique=True)
     name = models.CharField(max_length=255, verbose_name=u'Название')
     name_en = models.CharField(max_length=255, verbose_name=u'Название на английском')
@@ -103,14 +105,16 @@ class Match(models.Model):
         verbose_name_plural = 'Матчи'
         ordering = ['deleted', '-game_start']
 
-    def create_game_num_and_game_id(self):
+    def create_game_num_game_id_and_uniq(self):
         last_obj = Match.objects.filter(admin_created=True).last()
         if last_obj:
             self.game_id = last_obj.game_id - 1
             self.game_num = last_obj.game_num - 1
+            self.uniq = str(int(last_obj.uniq) - 1)
         else:
             self.game_id = -1
             self.game_num = -1
+            self.uniq = str(-1)
 
 
 class MatchAdminResult(models.Model):
@@ -127,3 +131,9 @@ class MatchAdminResult(models.Model):
         verbose_name_plural = 'Результаты матчей, созданные админом'
         ordering = ['match']
 
+
+@receiver(post_save, sender=Match)
+def create_admin_match(sender: Match, instance: Match, created: bool, **kwargs):
+    if created:
+        instance.create_game_num_game_id_and_uniq()
+        instance.save()
