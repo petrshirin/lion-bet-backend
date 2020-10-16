@@ -135,5 +135,6 @@ class MatchAdminResult(models.Model):
 @receiver(post_save, sender=Match)
 def create_admin_match(sender: Match, instance: Match, created: bool, **kwargs):
     if created:
-        instance.create_game_num_game_id_and_uniq()
-        instance.save()
+        if instance.admin_created:
+            instance.create_game_num_game_id_and_uniq()
+            instance.save()
