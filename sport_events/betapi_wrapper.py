@@ -5,6 +5,7 @@ from typing import Union, Dict, Any
 from datetime import datetime, timezone, timedelta
 import logging
 from django.conf import settings
+from django.db.utils import IntegrityError
 
 
 BASE_PATH = settings.BET_API_HOST
@@ -326,6 +327,8 @@ class MatchWrapper(BetApiWrapper):
                         except Tournament.DoesNotExist:
                             LOG.error(f"TOURNAMENT_ID: {match.get('tournament_id')}")
                             continue
+                        except IntegrityError:
+                            LOG.error(f"Not unique match {match.get('uniq')}")
 
                         for event in match.get('game_oc_list'):
 
