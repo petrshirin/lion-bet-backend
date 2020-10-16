@@ -446,8 +446,8 @@ class CurrentMatchWrapper(BetApiWrapper):
             if resp['body'] == 'Error in you package!' or resp['body'] == 'Your package life has expired!':
                 LOG.error(f"{resp['body']} {datetime.utcnow()}")
                 return
-            print(resp['body'] == [] or resp['body'].get('finale', False) is True or isinstance(resp['body'], str))
-            if resp['body'] == [] or resp['body'].get('finale', False) is True or isinstance(resp['body'], str):
+            print(isinstance(resp['body'], str) or resp['body'] == [] or resp['body'].get('finale', False) is True)
+            if isinstance(resp['body'], str) or resp['body'] == [] or resp['body'].get('finale', False) is True:
                 try:
                     if self.uniq:
                         match = Match.objects.get(uniq=self.uniq)
