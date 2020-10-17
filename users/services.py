@@ -59,14 +59,14 @@ def register_client(request: Request) -> Dict:
         key = generate_token(user)
         new_email = UserEmail(template_id=1, user=user)
         new_email.generate_code()
-        is_send = send_email_to_user(1, [client.email], f'http://front.ru/password/forgot/{new_email.code}')
+        is_send = send_email_to_user(1, [client.email], f'https://royal-lion.bet/activate/{new_email.code}')
         if is_send:
             new_email.save()
         if key is not None:
             return {'data': ser.data, 'success': True, 'key': key}
         else:
             return {'data': ser.data, 'success': False,
-                    'errors': "Токен не сгенерировал, используйте форму логина"}
+                    'errors': "Токен не сгенерирован, используйте форму логина"}
     else:
         return {'errors': ser.errors, 'success': False}
 
