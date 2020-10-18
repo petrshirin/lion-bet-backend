@@ -372,6 +372,14 @@ class MatchWrapper(BetApiWrapper):
                         old_match.game_start = datetime.fromtimestamp(match.get('game_start'), tz=tz)
                         old_match.ended = bool(match.get('finale'))
                         old_match.save()
+                        for ev in old_match.events.all():
+                            for event in match.get('game_oc_list'):
+                                if ev.oc_name == event['oc_name']:
+                                    ev.oc_rate = event['oc_rate']
+                                    ev.oc_pointer = event['oc_pointer']
+                                    ev.save()
+
+
 
     @staticmethod
     def generate_short_name(oc_group: str, oc_name: str, match: Match) -> Union[str, None]:
