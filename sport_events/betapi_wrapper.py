@@ -247,7 +247,7 @@ class MatchWrapper(BetApiWrapper):
                  request_type: str = 'line',
                  lang: str = 'ru',
                  sport_id: int = 0,
-                 country_id: int = 0, count: int = 100):
+                 country_id: int = 0, count: int = 500):
         """
         get all countries of some sport and some country
         :param request_type:

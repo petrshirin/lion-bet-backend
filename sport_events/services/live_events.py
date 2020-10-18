@@ -60,10 +60,8 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
     tournaments = Tournament.objects.filter(live_query_t).all()
     live_query_m = Q(request_type='live', deleted=False, ended=False)
     data = []
-    print(tournaments)
     for tournament in tournaments:
         matches = Match.objects.filter(live_query_m, tournament=tournament).all()
-        print(matches)
         if not matches:
             continue
         matches_ser = SimpleMatchSerializer(matches, many=True)
