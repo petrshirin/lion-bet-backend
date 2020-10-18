@@ -213,22 +213,32 @@ class TournamentWrapper(BetApiWrapper):
         items = self._do_request()
         if items:
             for tournament in items['body']:
-                if not Tournament.objects.filter(api_id=tournament.get('id')).first():
-                    try:
-                        sport = Sport.objects.get(api_id=tournament.get('sport_id'))
-                        country = Country.objects.get(api_id=tournament.get('country_id'))
+
+                tournament_model = Tournament.objects.filter(api_id=tournament.get('id')).first()
+                try:
+                    sport = Sport.objects.get(api_id=tournament.get('sport_id'))
+                    country = Country.objects.get(api_id=tournament.get('country_id'))
+                    if not tournament_model:
+
                         Tournament.objects.create(api_id=tournament.get('id'),
                                                   name=tournament.get('name'),
                                                   name_en=tournament.get('name_en'),
                                                   sport=sport,
                                                   country=country,
                                                   request_type=self.request_type)
-                    except Sport.DoesNotExist:
-                        LOG.error(f"SPORT_ID: {tournament.get('sport_id')}")
-                        continue
-                    except Country.DoesNotExist:
-                        LOG.error(f"COUNTRY_ID: {tournament.get('country_id')}")
-                        continue
+                    else:
+                        tournament_model.name = tournament.get('name')
+                        tournament_model.name_en = tournament.get('name_en')
+                        tournament_model.sport = sport
+                        tournament_model.country = country
+                        tournament_model.request_type = self.request_type
+                        tournament_model.save()
+                except Sport.DoesNotExist:
+                    LOG.error(f"SPORT_ID: {tournament.get('sport_id')}")
+                    continue
+                except Country.DoesNotExist:
+                    LOG.error(f"COUNTRY_ID: {tournament.get('country_id')}")
+                    continue
 
 
 class MatchWrapper(BetApiWrapper):
