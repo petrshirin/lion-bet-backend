@@ -61,6 +61,7 @@ class MatchEvent(models.Model):
     short_name = models.CharField(max_length=15, default=None, null=True)
     deleted = models.BooleanField(default=False, verbose_name=u'Удален')
     admin_created = models.BooleanField(default=False, verbose_name=u'Создан админом')
+    last_changed = models.PositiveSmallIntegerField(default=0, verbose_name='Последнее изменение')
 
     def __str__(self):
         return f'{self.oc_group_name} {self.oc_name}'
@@ -103,7 +104,7 @@ class Match(models.Model):
     class Meta:
         verbose_name = 'Матч'
         verbose_name_plural = 'Матчи'
-        ordering = ['deleted', '-game_start']
+        ordering = ['game_id']
 
     def create_game_num_game_id_and_uniq(self):
         last_obj = Match.objects.filter(admin_created=True).last()
@@ -137,4 +138,12 @@ def create_admin_match(sender: Match, instance: Match, created: bool, **kwargs):
     if created:
         if instance.admin_created:
             instance.create_game_num_game_id_and_uniq()
+            instance.save()
+
+
+@receiver(post_save, sender=MatchEvent)
+def create_admin_match_event(sender: MatchEvent, instance: MatchEvent, created: bool, **kwargs):
+    if created:
+        if instance.admin_created:
+            instance.create_oc_pointer()
             instance.save()

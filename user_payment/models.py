@@ -27,10 +27,11 @@ class UserMoneyRequest(models.Model):
 @receiver(post_save, sender=UserMoneyRequest)
 def check_user_balance(sender: UserMoneyRequest, instance: UserMoneyRequest, created: bool, **kwargs):
     if created:
-        customer_account = CustomerAccount.objects.filter(user=instance.user).first()
-        if instance.amount > customer_account.current_balance:
-            instance.accepted = False
-            instance.save()
+        if instance.request_type == 'output':
+            customer_account = CustomerAccount.objects.filter(user=instance.user).first()
+            if instance.amount > customer_account.current_balance:
+                instance.accepted = False
+                instance.save()
 
 
 @receiver(post_save, sender=UserMoneyRequest)
@@ -41,5 +42,7 @@ def change_user_balance(sender: UserMoneyRequest, instance: UserMoneyRequest, **
             customer_account.current_balance += instance.amount
         else:
             customer_account.current_balance -= instance.amount
+
+        customer_account.current_balance.save()
 
 
