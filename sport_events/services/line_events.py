@@ -104,7 +104,7 @@ def split_events(events: List) -> Tuple[list, list]:
 
 def sport_results(request: Request, sport_id: int = 0, page: int = 0) -> Tuple[ReturnList, int]:
     if sport_id:
-        matches = Match.objects.filter(deleted=False, ended=True, sport_id=sport_id).all()
+        matches = Match.objects.filter(deleted=False, ended=True, sport_id=sport_id).all()[page*20:page*20+20]
     else:
         matches = Match.objects.filter(deleted=False, ended=True).all()[page*20:page*20+20]
 
