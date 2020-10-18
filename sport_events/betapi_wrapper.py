@@ -260,12 +260,15 @@ class MatchWrapper(BetApiWrapper):
         self.country_id = country_id
         self.count = count
 
-    def _do_request(self) -> Union[Dict, None]:
+    def _do_request(self, sport_id: int = None) -> Union[Dict, None]:
         """
         do request to bet api and get all events to json format
         :return:
         """
-        response = requests.get(f'{self.url}/events/{self.sport_id}/{self.country_id}/sub/{self.count}/{self.request_type}/{self.lang}', headers=self.headers)
+        if sport_id is None:
+            response = requests.get(f'{self.url}/events/{self.sport_id}/{self.country_id}/sub/{self.count}/{self.request_type}/{self.lang}', headers=self.headers)
+        else:
+            response = requests.get(f'{self.url}/events/{sport_id}/{self.country_id}/sub/{self.count}/{self.request_type}/{self.lang}', headers=self.headers)
         if response.ok:
             return response.json()
         else:
@@ -300,13 +303,16 @@ class MatchWrapper(BetApiWrapper):
         save all countries from request to db
         :return:
         """
-        items = self._do_request()
-        if items:
-            LOG.debug(items)
-            if isinstance(items['body'], str):
-                LOG.error(f"{items['body']} {datetime.utcnow()}")
+        all_sports_from_db = Sport.objects.all()
+        items = []
+        for sport_from_db in all_sports_from_db:
+            tmp_items = self._do_request(sport_from_db.api_id)
+            if isinstance(tmp_items['body'], str):
+                LOG.error(f"{tmp_items['body']} {datetime.utcnow()}")
                 return
-            for tournament in items['body']:
+            items += tmp_items['body']
+        if items:
+            for tournament in items:
                 for match in tournament['events_list']:
                     old_match = Match.objects.filter(uniq=match.get('uniq')).first()
                     if not old_match:
