@@ -89,7 +89,7 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
             count_matches += 1
         tmp_data['matches'] = matches
         data.append(tmp_data)
-    return data, total_count
+    return data[low_line:high_line], total_count
 
 
 def split_events(events: List) -> Tuple[list, list]:
