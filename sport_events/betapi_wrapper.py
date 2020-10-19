@@ -381,6 +381,20 @@ class MatchWrapper(BetApiWrapper):
                                     ev.oc_pointer = event['oc_pointer']
 
                                     ev.save()
+                                else:
+                                    short_name = self.generate_short_name(event['oc_group_name'],
+                                                                          event['oc_name'],
+                                                                          old_match)
+
+                                    if short_name:
+                                        new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
+                                                                              oc_name=event['oc_name'],
+                                                                              oc_rate=event['oc_rate'],
+                                                                              oc_pointer=event['oc_pointer'],
+                                                                              short_name=short_name,
+                                                                              last_changed=0)
+                                        old_match.events.add(new_event)
+
 
     @staticmethod
     def generate_short_name(oc_group: str, oc_name: str, match: Match) -> Union[str, None]:
