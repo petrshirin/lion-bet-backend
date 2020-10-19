@@ -373,27 +373,30 @@ class MatchWrapper(BetApiWrapper):
                         old_match.game_start = datetime.fromtimestamp(match.get('game_start'), tz=tz)
                         old_match.ended = bool(match.get('finale'))
                         old_match.save()
-                        for ev in old_match.events.all():
-                            for event in match.get('game_oc_list'):
+                        for event in match.get('game_oc_list'):
+                            is_have = False
+                            for ev in old_match.events.all():
+                                is_have = True
                                 if ev.oc_name == event['oc_name']:
                                     ev.last_changed = 0 if ev.oc_rate == event['oc_rate'] else 1 if ev.oc_rate < event['oc_rate'] else -1
                                     ev.oc_rate = event['oc_rate']
                                     ev.oc_pointer = event['oc_pointer']
 
                                     ev.save()
-                                else:
-                                    short_name = self.generate_short_name(event['oc_group_name'],
-                                                                          event['oc_name'],
-                                                                          old_match)
 
-                                    if short_name:
-                                        new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
-                                                                              oc_name=event['oc_name'],
-                                                                              oc_rate=event['oc_rate'],
-                                                                              oc_pointer=event['oc_pointer'],
-                                                                              short_name=short_name,
-                                                                              last_changed=0)
-                                        old_match.events.add(new_event)
+                            if not is_have:
+                                short_name = self.generate_short_name(event['oc_group_name'],
+                                                                      event['oc_name'],
+                                                                      old_match)
+
+                                if short_name:
+                                    new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
+                                                                          oc_name=event['oc_name'],
+                                                                          oc_rate=event['oc_rate'],
+                                                                          oc_pointer=event['oc_pointer'],
+                                                                          short_name=short_name,
+                                                                          last_changed=0)
+                                    old_match.events.add(new_event)
 
 
     @staticmethod
