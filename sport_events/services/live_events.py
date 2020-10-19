@@ -68,7 +68,7 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
     total_count = 0
     for tournament in tournaments:
 
-        total_count = Match.objects.filter(live_query_m, tournament=tournament).count()
+        total_count += Match.objects.filter(live_query_m, tournament=tournament).count()
         if count_matches >= high_line:
             continue
 
