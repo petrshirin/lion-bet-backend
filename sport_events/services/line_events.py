@@ -5,6 +5,7 @@ from sport_events.serializers import SportSerializer, CountrySerializer, \
     TournamentSerializer, MatchSerializer, SimpleMatchSerializer, MatchWithoutEventsSerializer
 from django.db.models.query import Q
 from typing import List, Tuple
+from .utils import split_events, calculate_tournament_with_matches_len
 
 
 def get_line_sports() -> ReturnList:
@@ -60,23 +61,18 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
 
     tournaments = Tournament.objects.filter(live_query_t).all()
     live_query_m = Q(request_type='line', deleted=False, ended=False)
+
+    low_line = page * 5
+    high_line = low_line + 5
     data = []
 
-    low_line = page * 20
-    high_line = low_line + 20
+    count_tournaments = 0
 
-    count_matches = 0
-    start_matches = 0
+    full_len_tournaments = calculate_tournament_with_matches_len(tournaments)
 
-    total_count = Match.objects.filter(live_query_m, sport=tournaments[0].sport).count()
-    for tournament in tournaments:
-
-        len_matches = Match.objects.filter(live_query_m, tournament=tournament).count()
-        start_matches += len_matches
-
-        if start_matches < low_line:
-            data += [0 for i in range(len_matches)]
-            continue
+    for tournament in tournaments[low_line:]:
+        if count_tournaments >= 5:
+            break
 
         matches = Match.objects.filter(live_query_m, tournament=tournament).all()
 
@@ -87,29 +83,13 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
         tmp_data = dict(tournament_ser.data)
         matches = []
         for match in matches_ser.data:
-            if count_matches >= high_line:
-                tmp_data['matches'] = matches
-                data.append(tmp_data)
-                return data[low_line:high_line], total_count
-
             tmp_match = dict(match)
             tmp_match['main_events'], tmp_match['additional_events'] = split_events(match['events'])
             matches.append(tmp_match)
-            count_matches += 1
         tmp_data['matches'] = matches
         data.append(tmp_data)
-    return data[low_line:high_line], total_count
-
-
-def split_events(events: List) -> Tuple[list, list]:
-    main_events = []
-    additional_events = []
-    for event in events:
-        if event['oc_group_name'] == '1x2' or event['oc_group_name'] == 'Тотал':
-            main_events.append(event)
-        else:
-            additional_events.append(event)
-    return main_events, additional_events
+        count_tournaments += 1
+    return data, full_len_tournaments
 
 
 def sport_results(request: Request, sport_id: int = 0, page: int = 0) -> Tuple[ReturnList, int]:
