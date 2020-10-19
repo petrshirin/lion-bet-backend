@@ -8,6 +8,7 @@ from typing import Optional, List, \
 from users.models import UserEmail, EmailTemplate
 from django.core.mail import send_mail
 import logging
+from smtplib import SMTPException
 
 LOG = logging.getLogger(__name__)
 
@@ -69,12 +70,12 @@ def _send_letter_to_info_email(data_info: Dict, email_to_send: str = 'info@royal
         template = EmailTemplate.objects.get(pk=3)
     except EmailTemplate.DoesNotExist:
         return False
-    result = send_mail(template.subject, template.text.format(data_info.get('name'),
-                                                              data_info.get('phone'),
-                                                              data_info.get('text')), template.from_email, [email_to_send])
-    LOG.info(f'Email of type 3 send on , result: {result}')
-    if result:
-        return True
-    else:
+    try:
+        send_mail(template.subject, template.text.format(data_info.get('name'),
+                                                         data_info.get('phone'),
+                                                         data_info.get('text')), template.from_email, [email_to_send])
+    except SMTPException as e:
+        LOG.error(e)
         return False
-
+    LOG.info(f'Email of type 3 send on')
+    return True
