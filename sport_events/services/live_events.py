@@ -65,12 +65,8 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
     data = []
 
     count_matches = 0
-    total_count = 0
+    total_count = Match.objects.filter(live_query_m, sport=tournaments[0].sport).count()
     for tournament in tournaments:
-
-        total_count += Match.objects.filter(live_query_m, tournament=tournament).count()
-        if count_matches >= high_line:
-            continue
 
         matches = Match.objects.filter(live_query_m, tournament=tournament).all()
 
@@ -82,7 +78,9 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
         matches = []
         for match in matches_ser.data:
             if count_matches >= high_line:
-                break
+                tmp_data['matches'] = matches
+                data.append(tmp_data)
+                return data, total_count
 
             tmp_match = dict(match)
             tmp_match['main_events'], tmp_match['additional_events'] = split_events(match['events'])
