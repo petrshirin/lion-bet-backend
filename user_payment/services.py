@@ -18,6 +18,10 @@ def make_input_request(request: Request) -> Dict:
     if request.data.get('amount'):
         try:
             amount = float(request.data.get('amount'))
+
+            if amount < 500:
+                return {"errors": "Минимальная сумма должна быть 500 рублей", "success": False}
+
             url = wrapper.create_form(amount)
             if url:
                 UserMoneyRequest.objects.create(user=request.user, amount=amount, build=wrapper.build)
@@ -54,3 +58,4 @@ def user_output_requests(user: User) -> Dict:
     user_requests = UserMoneyRequest.objects.filter(request_type='output', user=user).all()
     user_requests_ser = UserMoneyRequestSerializer(user_requests, many=True)
     return {"data": user_requests_ser.data, "success": True}
+
