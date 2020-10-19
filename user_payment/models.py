@@ -43,6 +43,6 @@ def change_user_balance(sender: UserMoneyRequest, instance: UserMoneyRequest, **
         else:
             customer_account.current_balance -= instance.amount
 
-        customer_account.current_balance.save()
+        customer_account.save()
 
 
