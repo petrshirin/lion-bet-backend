@@ -358,7 +358,8 @@ class MatchWrapper(BetApiWrapper):
                                                                       oc_name=event['oc_name'],
                                                                       oc_rate=event['oc_rate'],
                                                                       oc_pointer=event['oc_pointer'],
-                                                                      short_name=short_name)
+                                                                      short_name=short_name,
+                                                                      last_changed=0)
                                 new_match.events.add(new_event)
                         LOG.info(f'{new_match.game_num}, events: {new_match.events.count()}')
 

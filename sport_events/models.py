@@ -61,7 +61,7 @@ class MatchEvent(models.Model):
     short_name = models.CharField(max_length=15, default=None, null=True)
     deleted = models.BooleanField(default=False, verbose_name=u'Удален')
     admin_created = models.BooleanField(default=False, verbose_name=u'Создан админом')
-    last_changed = models.PositiveSmallIntegerField(default=0, verbose_name='Последнее изменение')
+    last_changed = models.SmallIntegerField(default=0, verbose_name='Последнее изменение')
 
     def __str__(self):
         return f'{self.oc_group_name} {self.oc_name}'
