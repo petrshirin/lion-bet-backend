@@ -2,7 +2,7 @@ from rest_framework.utils.serializer_helpers import ReturnList
 from sport_events.betapi_wrapper import *
 from sport_events.serializers import TournamentSerializer, MatchSerializer, SportSerializer, CountrySerializer, SimpleMatchSerializer
 from django.db.models.query import Q
-from .utils import split_events, calculate_tournament_with_matches_len
+from .utils import split_events, delete_void_tournaments
 from typing import List, Tuple
 
 
@@ -65,7 +65,7 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
 
     count_tournaments = 0
 
-    full_len_tournaments = calculate_tournament_with_matches_len(tournaments)
+    tournaments = delete_void_tournaments(tournaments)
     m = 0
 
     for tournament in tournaments[low_line:]:
@@ -90,5 +90,5 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
         data.append(tmp_data)
         count_tournaments += 1
     print(m)
-    return data, full_len_tournaments
+    return data, len(tournaments)
 

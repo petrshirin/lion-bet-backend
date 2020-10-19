@@ -5,7 +5,7 @@ from sport_events.serializers import SportSerializer, CountrySerializer, \
     TournamentSerializer, MatchSerializer, SimpleMatchSerializer, MatchWithoutEventsSerializer
 from django.db.models.query import Q
 from typing import List, Tuple
-from .utils import split_events, calculate_tournament_with_matches_len
+from .utils import split_events, delete_void_tournaments
 
 
 def get_line_sports() -> ReturnList:
@@ -68,7 +68,7 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
 
     count_tournaments = 0
 
-    full_len_tournaments = calculate_tournament_with_matches_len(tournaments)
+    tournaments = delete_void_tournaments(tournaments)
 
     for tournament in tournaments[low_line:]:
         if count_tournaments >= 5:
@@ -89,7 +89,7 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
         tmp_data['matches'] = matches
         data.append(tmp_data)
         count_tournaments += 1
-    return data, full_len_tournaments
+    return data, len(tournaments)
 
 
 def sport_results(request: Request, sport_id: int = 0, page: int = 0) -> Tuple[ReturnList, int]:

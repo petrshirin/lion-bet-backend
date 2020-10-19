@@ -3,15 +3,15 @@ from typing import List, Tuple
 from sport_events.models import Match
 
 
-def calculate_tournament_with_matches_len(tournaments: QuerySet) -> int:
-    count = 0
+def delete_void_tournaments(tournaments: QuerySet) -> List:
+    tournaments_with_matches = []
     live_query_m = Q(request_type='live', deleted=False, ended=False)
     for tournament in tournaments:
 
         print(Match.objects.filter(live_query_m, tournament=tournament).count())
         if Match.objects.filter(live_query_m, tournament=tournament).count():
-            count += 1
-    return count
+            tournaments_with_matches.append(tournament)
+    return tournaments_with_matches
 
 
 def split_events(events: List) -> Tuple[list, list]:
