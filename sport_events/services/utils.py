@@ -3,9 +3,9 @@ from typing import List, Tuple
 from sport_events.models import Match
 
 
-def delete_void_tournaments(tournaments: QuerySet) -> List:
+def delete_void_tournaments(tournaments: QuerySet, request_type: str = 'line') -> List:
     tournaments_with_matches = []
-    live_query_m = Q(request_type='live', deleted=False, ended=False)
+    live_query_m = Q(request_type=request_type, deleted=False, ended=False)
     for tournament in tournaments:
 
         print(Match.objects.filter(live_query_m, tournament=tournament).count())

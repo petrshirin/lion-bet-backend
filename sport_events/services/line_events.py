@@ -63,12 +63,11 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
     live_query_m = Q(request_type='line', deleted=False, ended=False)
 
     low_line = page * 5
-    high_line = low_line + 5
     data = []
 
     count_tournaments = 0
 
-    tournaments = delete_void_tournaments(tournaments)
+    tournaments = delete_void_tournaments(tournaments, 'line')
 
     for tournament in tournaments[low_line:]:
         if count_tournaments >= 5:

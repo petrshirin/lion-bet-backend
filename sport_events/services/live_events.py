@@ -65,16 +65,13 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
 
     count_tournaments = 0
 
-    tournaments = delete_void_tournaments(tournaments)
-    m = 0
+    tournaments = delete_void_tournaments(tournaments, 'live')
 
     for tournament in tournaments[low_line:]:
         if count_tournaments >= 5:
             break
 
         matches = Match.objects.filter(live_query_m, tournament=tournament).all()
-
-        m += len(matches)
 
         if not matches:
             continue
@@ -89,6 +86,5 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
         tmp_data['matches'] = matches
         data.append(tmp_data)
         count_tournaments += 1
-    print(m)
     return data, len(tournaments)
 
