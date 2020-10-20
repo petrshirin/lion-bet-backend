@@ -27,7 +27,7 @@ class UserMoneyRequest(models.Model):
             elif len(self.account_number) > 4:
                 return ''.join(['*' for i in range(len(self.account_number) - 4)]) + self.account_number[-4:]
             else:
-                return self.account_name
+                return self.account_number
         return ''
 
     class Meta:
