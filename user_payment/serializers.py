@@ -8,6 +8,6 @@ class UserMoneyRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserMoneyRequest
-        fields = ('user_id', 'request_type', 'amount', 'date_created', 'accepted', 'request_type', 'account_name')
+        fields = ('user_id', 'request_type', 'amount', 'date_created', 'accepted', 'request_type', 'account_number')
 
 
