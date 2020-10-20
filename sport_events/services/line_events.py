@@ -5,7 +5,8 @@ from sport_events.serializers import SportSerializer, CountrySerializer, \
     TournamentSerializer, MatchSerializer, SimpleMatchSerializer, MatchWithoutEventsSerializer
 from django.db.models.query import Q
 from typing import List, Tuple
-from .utils import split_events, delete_void_tournaments
+from .utils import split_events, delete_void_tournaments, generate_page_of_tournaments
+
 
 
 def get_line_sports() -> ReturnList:
@@ -59,44 +60,17 @@ def get_list_of_tournaments_with_matches_line(sport_id: int = 0, page: int = 0) 
     else:
         live_query_t = Q(request_type='line', deleted=False)
 
-    tournaments = Tournament.objects.filter(live_query_t).all()
     live_query_m = Q(request_type='line', deleted=False, ended=False)
 
-    low_line = page * 5
-    data = []
-
-    count_tournaments = 0
-
-    tournaments = delete_void_tournaments(tournaments, 'line')
-
-    for tournament in tournaments[low_line:]:
-        if count_tournaments >= 5:
-            break
-
-        matches = Match.objects.filter(live_query_m, tournament=tournament).all()
-
-        if not matches:
-            continue
-        matches_ser = SimpleMatchSerializer(matches, many=True)
-        tournament_ser = TournamentSerializer(tournament)
-        tmp_data = dict(tournament_ser.data)
-        matches = []
-        for match in matches_ser.data:
-            tmp_match = dict(match)
-            tmp_match['main_events'], tmp_match['additional_events'] = split_events(match['events'])
-            matches.append(tmp_match)
-        tmp_data['matches'] = matches
-        data.append(tmp_data)
-        count_tournaments += 1
-    return data, len(tournaments)
+    return generate_page_of_tournaments(page, live_query_t, live_query_m)
 
 
-def sport_results(request: Request, sport_id: int = 0, page: int = 0) -> Tuple[ReturnList, int]:
+def sport_results(sport_id: int = 0, page: int = 0) -> Tuple[List, int]:
     if sport_id:
-        matches = Match.objects.filter(deleted=False, ended=True, sport_id=sport_id).all()[page*20:page*20+20]
+        query_t = Q(deleted=False, sport__api_id=sport_id)
     else:
-        matches = Match.objects.filter(deleted=False, ended=True).all()[page*20:page*20+20]
+        query_t = Q(deleted=False)
 
-    data = MatchWithoutEventsSerializer(matches, many=True).data
+    query_m = Q(deleted=False, ended=True)
 
-    return data, len(data)
+    return generate_page_of_tournaments(page, query_t, query_m)

@@ -1,6 +1,7 @@
 from django.db.models.query import Q, QuerySet
 from typing import List, Tuple
-from sport_events.models import Match, MatchEvent
+from sport_events.models import Match, Tournament
+from sport_events.serializers import SimpleMatchSerializer, TournamentSerializer
 
 
 EVENTS_TO_INT = {
@@ -52,5 +53,35 @@ def sort_event(event: dict) -> int:
     print(event['short_name'].split(' '))
     return EVENTS_TO_INT[event['short_name'].split(' ')[0]]
 
+
+def generate_page_of_tournaments(page: int, query_t: Q, query_m: Q) -> Tuple[List, int]:
+    tournaments = Tournament.objects.filter(query_t).all()
+    low_line = page * 5
+    data = []
+
+    count_tournaments = 0
+
+    tournaments = delete_void_tournaments(tournaments, 'line')
+
+    for tournament in tournaments[low_line:]:
+        if count_tournaments >= 5:
+            break
+
+        matches = Match.objects.filter(query_m, tournament=tournament).all()
+
+        if not matches:
+            continue
+        matches_ser = SimpleMatchSerializer(matches, many=True)
+        tournament_ser = TournamentSerializer(tournament)
+        tmp_data = dict(tournament_ser.data)
+        matches = []
+        for match in matches_ser.data:
+            tmp_match = dict(match)
+            tmp_match['main_events'], tmp_match['additional_events'] = split_events(match['events'])
+            matches.append(tmp_match)
+        tmp_data['matches'] = matches
+        data.append(tmp_data)
+        count_tournaments += 1
+    return data, len(tournaments)
 
 

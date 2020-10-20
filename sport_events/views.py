@@ -98,7 +98,7 @@ def tournaments_with_matches_live_view(request: Request, sport_id: int = 0, page
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def results_matches(request: Request, sport_id: int = 0, page: int = 0) -> Response:
-    response, length = sport_results(request, sport_id, page)
+    response, length = sport_results(sport_id, page)
     return Response({'success': True, 'data': response, 'length': length})
 
 
