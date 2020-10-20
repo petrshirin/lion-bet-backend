@@ -10,6 +10,7 @@ from django.db.models.query import Q
 from rest_framework.authtoken.models import Token
 from django.core.mail import send_mail
 import logging
+from smtplib import SMTPException
 
 
 LOG = logging.getLogger(__name__)
@@ -104,7 +105,7 @@ def change_client_info(request: Request) -> Dict:
             request.user.client.activated = False
             new_email = UserEmail(template_id=1, user=request.user)
             new_email.generate_code()
-            is_send = send_email_to_user(1, [request.user.client.email], f'http://front.ru/password/forgot/{new_email.code}')
+            is_send = send_email_to_user(1, [request.user.client.email], f'https://royal-lion.bet/activate/{new_email.code}')
             if is_send:
                 new_email.save()
             request.user.client.save()
@@ -154,12 +155,12 @@ def send_email_to_user(mail_type: int = 1, recipient_list: List[str] = None, ema
         template = EmailTemplate.objects.get(pk=mail_type)
     except EmailTemplate.DoesNotExist:
         return False
-    result = send_mail(template.subject, template.text.format(email_info), template.from_email, recipient_list)
-    LOG.info(f'Email of type {mail_type} send this users: {recipient_list}, result: {result}')
-    if result:
-        return True
-    else:
+    try:
+        send_mail(template.subject, template.text.format(email_info), template.from_email, recipient_list)
+        LOG.info(f'Email of type {mail_type} send this users: {recipient_list}, result: ')
+    except SMTPException:
         return False
+    return True
 
 
 def check_code(mail_type: int, code: str) -> Union[UserEmail, None]:
@@ -179,7 +180,6 @@ def user_forgot_password(request: Request) -> Dict:
     new_password = ''.join([random.choice(string.ascii_letters) for i in range(7)])
     is_send = send_email_to_user(2, [client.email], f"user: {client.user.username}\n new_password: {new_password}\n")
     if not is_send:
-        LOG.error('template dont find')
         return {"errors": "Не удалось отправить email", 'success': False}
     new_email = UserEmail(template_id=2, user=client.user)
     new_email.generate_code()
