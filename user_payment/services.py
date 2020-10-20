@@ -14,7 +14,7 @@ LOG = logging.getLogger(__name__)
 def make_input_request(request: Request) -> Dict:
     wrapper = QiwiWrapper()
     if request.user.customeraccount.blocked:
-        return {"errors": "Ваш счет заблокирова", "success": False}
+        return {"errors": "Ваш счет заблокирован", "success": False}
     if request.data.get('amount'):
         try:
             amount = float(request.data.get('amount'))
@@ -33,7 +33,11 @@ def make_input_request(request: Request) -> Dict:
 
 def make_output_request(request: Request) -> Dict:
     if request.user.customeraccount.blocked:
-        return {"errors": "Ваш счет заблокирова", "success": False}
+        return {"errors": "Ваш счет заблокирован", "success": False}
+
+    if not request.data.get('account_number', None):
+        return {"errors": "Номер счета не указан", "success": False}
+
     if request.data.get('amount'):
         try:
             amount = float(request.data.get('amount'))
@@ -41,8 +45,11 @@ def make_output_request(request: Request) -> Dict:
                 return {"errors": "Недостаточное количество пополнений для вывода", "success": False}
             if not check_balance(request.user, amount):
                 return {"errors": "Недостаточно средств для вывода", 'success': False}
-            UserMoneyRequest.objects.create(user=request.user, amount=amount,
-                                            request_type='output', method=request.data.get('method', None))
+            UserMoneyRequest.objects.create(user=request.user,
+                                            amount=amount,
+                                            request_type='output',
+                                            method=request.data.get('method', None),
+                                            account_number=request.data.get('account_number', None))
             return {"data": 'ok', "success": True}
         except ValueError as e:
             LOG.error(e)

@@ -15,9 +15,20 @@ class UserMoneyRequest(models.Model):
     accepted = models.BooleanField(default=None, null=True, verbose_name=u'Одобрена')
     build = models.CharField(max_length=32, default=None, null=True, verbose_name=u'Код для пополнения')
     method = models.CharField(max_length=50, default='input_qiwi', null=True)
+    account_number = models.CharField(max_length=50, default=None, null=True)
 
     def __str__(self):
         return f'{self.request_type} {self.amount}'
+
+    def get_hidden_account_number(self):
+        if self.account_number:
+            if len(self.account_number) > 15:
+                return ''.join(self.account_number[:4] + ''.join(['*' for i in range(len(self.account_number) - 8)]) + self.account_name[-4:])
+            elif len(self.account_number) > 4:
+                return ''.join(['*' for i in range(len(self.account_number) - 4)]) + self.account_number[-4:]
+            else:
+                return self.account_name
+        return ''
 
     class Meta:
         verbose_name = 'Запрос на Ввод/Вывод'
