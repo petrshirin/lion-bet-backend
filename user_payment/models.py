@@ -23,7 +23,7 @@ class UserMoneyRequest(models.Model):
     def get_hidden_account_number(self):
         if self.account_number:
             if len(self.account_number) > 15:
-                return ''.join(self.account_number[:4] + ''.join(['*' for i in range(len(self.account_number) - 8)]) + self.account_name[-4:])
+                return ''.join(self.account_number[:4] + ''.join(['*' for i in range(len(self.account_number) - 8)]) + self.account_number[-4:])
             elif len(self.account_number) > 4:
                 return ''.join(['*' for i in range(len(self.account_number) - 4)]) + self.account_number[-4:]
             else:
