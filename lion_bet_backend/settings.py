@@ -243,6 +243,7 @@ CORS_ALLOW_HEADERS = [
 # Celery
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_ACKS_LATE = True
 
 # Static files
 STATIC_URL = '/static/'
