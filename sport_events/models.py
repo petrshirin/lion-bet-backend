@@ -54,7 +54,7 @@ class Tournament(models.Model):
         verbose_name_plural = 'Турниры'
 
     def create_api_id(self):
-        last_obj = Tournament.objects.filter(admin_created=True).last()
+        last_obj = Tournament.objects.filter(admin_created=True).all()[-2]
         if last_obj:
             if last_obj.api_id:
                 self.api_id = -1
@@ -118,7 +118,7 @@ class Match(models.Model):
         ordering = ['game_id']
 
     def create_game_num_game_id_and_uniq(self):
-        last_obj = Match.objects.filter(admin_created=True).last()
+        last_obj = Match.objects.filter(admin_created=True).all()[-2]
         if last_obj:
             self.game_id = last_obj.game_id - 1 if last_obj.game_id else -1
             self.game_num = last_obj.game_num - 1 if last_obj.game_num else -1
