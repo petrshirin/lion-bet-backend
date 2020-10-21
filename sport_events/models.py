@@ -79,7 +79,7 @@ class MatchEvent(models.Model):
         verbose_name_plural = 'Исходы'
 
     def create_oc_pointer(self):
-        self.oc_pointer = f"{self.match_set.first().game_id}|0|0|0"
+        self.oc_pointer = f"{self.match_set.first().game_id if self.match_set.first() else ''}|0|0|0"
 
 
 class Match(models.Model):
