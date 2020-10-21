@@ -80,7 +80,7 @@ def close_results_for_admin_matches():
                     pass
                 else:
                     user_event = user_bet.events.first()
-                    if user_event.oc_group_name == '1x2':
+                    if user_event.oc_group_name == '1х2' or user_event.oc_group_name == '1x2':
                         if result.winner == 'П1':
                             command_winner = match.opp_1_name
                         elif result.winner == 'П2':
