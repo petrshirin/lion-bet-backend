@@ -19,6 +19,7 @@ def process_bet_status(request: Request) -> bool:
             return False
         status = bet.get('Status')
         exit_code = bet.get('ExtStatus')
+        print(status, exit_code)
         if status == 2 and exit_code == 0:
             user_bet.user.customeraccount.current_balance += user_bet.user_win
             user_bet.is_went = True
