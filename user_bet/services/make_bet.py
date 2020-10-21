@@ -39,7 +39,7 @@ def make_bet(request: Request, bet_type: str) -> Dict:
         if len(events) == 1:
             new_model_bet = _save_bet_to_db(request.user, {'bet_code': ''.join(choice(string.ascii_lowercase) for i in range(8)),
                                                            'd': {"BetHeadDetail": {"Coef": events[0].oc_rate,
-                                                                                   "PosWin": amount * events[0].oc_rate
+                                                                                   "PosWin": amount * float(events[0].oc_rate)
                                                                                    }
                                                                  }
                                                            },
