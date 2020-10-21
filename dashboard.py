@@ -185,9 +185,9 @@ class TableStatApp(modules.DashboardModule):
         self.template = 'table_stats.html'
         self.stat_name = kwargs['stat_name']
         if kwargs['model'] == 'Client':
-            self.per_day = Client.objects.filter(date_register=now() - timedelta(hours=24)).count()
-            self.per_week = Client.objects.filter(date_register=now() - timedelta(days=7)).count()
-            self.per_mouth = Client.objects.filter(date_register=now() - timedelta(days=30)).count()
+            self.per_day = Client.objects.filter(date_register__gte=now() - timedelta(hours=24)).count()
+            self.per_week = Client.objects.filter(date_register__gte=now() - timedelta(days=7)).count()
+            self.per_mouth = Client.objects.filter(date_register__gte=now() - timedelta(days=30)).count()
             self.per_all = Client.objects.filter().count()
         elif kwargs['model'] == 'UserMoneyRequest':
             self.per_day = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created=now() - timedelta(hours=24)).all().aggregate(Sum('amount'))['amount__sum'] or 0
