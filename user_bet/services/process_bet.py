@@ -8,15 +8,15 @@ from sport_events.models import MatchEvent
 
 
 def process_bet_status(request: Request) -> bool:
-    bets = request.data['Heads']
-    if bets:
+    bets = request.data.get('Heads')
+    if not bets:
         return False
     for bet in bets:
         user_bet = UserBet.objects.filter(bet_code=bet['KeyHead']['BarCode']).first()
         if not user_bet:
             return False
-        status = request.data['Status']
-        exit_code = request.data['ExtStatus']
+        status = request.datadata.get('Status')
+        exit_code = request.data.get('ExtStatus')
         if status == 2 and exit_code == 0:
             user_bet.user.customeraccount.current_balance += user_bet.user_win
             user_bet.is_went = True
