@@ -37,12 +37,13 @@ class Country(models.Model):
 
 
 class Tournament(models.Model):
-    api_id = models.IntegerField(verbose_name=u'Api Id')
+    api_id = models.IntegerField(verbose_name=u'Api Id', blank=True)
     name = models.CharField(max_length=255, verbose_name=u'Название')
     name_en = models.CharField(max_length=255, verbose_name=u'Название на английском')
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name='t_sport', verbose_name=u'Спорт')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='t_country', verbose_name=u'Страна')
     request_type = models.CharField(max_length=4, default='line', verbose_name=u'Тип')
+    admin_created = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False, verbose_name=u'Удален')
 
     def __str__(self):
@@ -52,12 +53,19 @@ class Tournament(models.Model):
         verbose_name = 'Турнир'
         verbose_name_plural = 'Турниры'
 
+    def create_api_id(self):
+        last_obj = Tournament.objects.filter(admin_created=True).last()
+        if last_obj:
+            self.api_id = last_obj.game_id - 1
+        else:
+            self.api_id = -1
+
 
 class MatchEvent(models.Model):
     oc_group_name = models.CharField(max_length=255, verbose_name=u'Название группы Рынка Коэффициентов')
     oc_name = models.CharField(max_length=255, verbose_name=u'Название исхода')
     oc_rate = models.DecimalField(max_digits=9, decimal_places=2, verbose_name=u'Коэффициент')
-    oc_pointer = models.CharField(max_length=100, verbose_name=u'Поинтер для API')
+    oc_pointer = models.CharField(max_length=100, verbose_name=u'Поинтер для API', blank=True)
     short_name = models.CharField(max_length=15, default=None, null=True)
     deleted = models.BooleanField(default=False, verbose_name=u'Удален')
     admin_created = models.BooleanField(default=False, verbose_name=u'Создан админом')
@@ -75,9 +83,9 @@ class MatchEvent(models.Model):
 
 
 class Match(models.Model):
-    game_num = models.IntegerField(verbose_name=u'Номер игры', null=True)
-    game_id = models.IntegerField(verbose_name=u'Id', null=True)
-    uniq = models.CharField(max_length=100, null=True, unique=True)
+    game_num = models.IntegerField(verbose_name=u'Номер игры', null=True, blank=True)
+    game_id = models.IntegerField(verbose_name=u'Id', null=True, blank=True)
+    uniq = models.CharField(max_length=100, null=True, unique=True, blank=True)
     name = models.CharField(max_length=255, verbose_name=u'Название')
     name_en = models.CharField(max_length=255, verbose_name=u'Название на английском')
     game_start = models.DateTimeField(verbose_name=u'Дата начала')
@@ -146,4 +154,12 @@ def create_admin_match_event(sender: MatchEvent, instance: MatchEvent, created: 
     if created:
         if instance.admin_created:
             instance.create_oc_pointer()
+            instance.save()
+
+
+@receiver(post_save, sender=Tournament)
+def create_admin_tournament(sender: Tournament, instance: Tournament, created: bool, **kwargs):
+    if created:
+        if instance.admin_created:
+            instance.create_api_id()
             instance.save()
