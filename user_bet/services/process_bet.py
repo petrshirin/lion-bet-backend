@@ -12,10 +12,10 @@ def process_bet_status(request: Request) -> bool:
     if not bets:
         return False
     for bet in bets:
-        user_bet = UserBet.objects.filter(bet_code=bet['KeyHead']['BarCode']).first()
+        user_bet = UserBet.objects.filter(bet_code=bet['KeyHead']['BarCode'], is_went=None).first()
         if not user_bet:
             return False
-        status = request.datadata.get('Status')
+        status = request.data.get('Status')
         exit_code = request.data.get('ExtStatus')
         if status == 2 and exit_code == 0:
             user_bet.user.customeraccount.current_balance += user_bet.user_win
