@@ -190,7 +190,7 @@ class TableStatApp(modules.DashboardModule):
             self.per_mouth = Client.objects.filter(date_register__gte=now() - timedelta(days=30)).count()
             self.per_all = Client.objects.filter().count()
         elif kwargs['model'] == 'UserMoneyRequest':
-            self.per_day = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created=now() - timedelta(hours=24)).all().aggregate(Sum('amount'))['amount__sum'] or 0
-            self.per_week = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created=now() - timedelta(days=7)).all().aggregate(Sum('amount'))['amount__sum'] or 0
-            self.per_mouth = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created=now() - timedelta(days=30)).all().aggregate(Sum('amount'))['amount__sum'] or 0
+            self.per_day = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created__gte=now() - timedelta(hours=24)).all().aggregate(Sum('amount'))['amount__sum'] or 0
+            self.per_week = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created__gte=now() - timedelta(days=7)).all().aggregate(Sum('amount'))['amount__sum'] or 0
+            self.per_mouth = UserMoneyRequest.objects.filter(accepted=True, request_type='input', date_created__gte=now() - timedelta(days=30)).all().aggregate(Sum('amount'))['amount__sum'] or 0
             self.per_all = UserMoneyRequest.objects.filter(accepted=True,  request_type='input').all().aggregate(Sum('amount'))['amount__sum'] or 0
