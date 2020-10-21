@@ -15,6 +15,7 @@ class UserBet(models.Model):
     user_bet = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=u'Ставка пользователя')
     user_win = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=u'Возможный выигрыш')
     is_went = models.BooleanField(default=None, null=True, verbose_name=u'Выиграна')
+    returned = models.BooleanField(default=False, verbose_name=u'Возвращена')
     date_created = models.DateTimeField(default=now, verbose_name=u'Дата создания')
     deleted = models.BooleanField(default=False, verbose_name=u'Удалена')
 
