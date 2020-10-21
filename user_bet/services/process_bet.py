@@ -29,6 +29,9 @@ def process_bet_status(request: Request) -> bool:
             user_bet.user.customeraccount.save()
             return True
         elif status == 4 and exit_code == 0:
+            if user_bet.is_went:
+                user_bet.user.customeraccount.current_balance -= user_bet.user_win
+                user_bet.user.customeraccount.save()
             user_bet.is_went = False
             user_bet.save()
             return True
