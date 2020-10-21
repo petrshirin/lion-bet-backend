@@ -6,6 +6,6 @@ from .models import UserMoneyRequest
 
 @admin.register(UserMoneyRequest)
 class UserMoneyRequestAdmin(admin.ModelAdmin):
-    list_display = ('request_type', 'amount', 'date_created', 'accepted', 'account_number', 'build')
+    list_display = ('request_type', 'user.client', 'amount', 'date_created', 'accepted', 'account_number', 'build')
     list_filter = ('request_type', 'date_created', 'accepted')
 
