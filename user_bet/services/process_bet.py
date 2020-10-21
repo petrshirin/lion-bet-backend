@@ -15,7 +15,7 @@ def process_bet_status(request: Request) -> bool:
         LOG.error('qqq')
         return False
     for bet in bets:
-        user_bet = UserBet.objects.filter(bet_code=bet['KeyHead']['BarCode'], is_went=None).first()
+        user_bet = UserBet.objects.filter(bet_code=bet['KeyHead']['BarCode']).first()
         if not user_bet:
             LOG.error('www')
             return False
