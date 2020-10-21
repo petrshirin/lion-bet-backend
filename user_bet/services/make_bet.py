@@ -37,13 +37,13 @@ def make_bet(request: Request, bet_type: str) -> Dict:
 
     if check_admin_bet(events):
         if len(events) == 1:
-            new_model_bet = _save_bet_to_db(request.user, {'bet_code': ''.join(choice(string.ascii_lowercase) for i in range(8)),
-                                                           'd': {"BetHeadDetail": {"Coef": events[0].oc_rate,
-                                                                                   "PosWin": amount * float(events[0].oc_rate)
-                                                                                   }
-                                                                 }
-                                                           },
-                                            bet_type, amount)
+            new_model_bet = _save_bet_to_db(user=request.user, new_bet={'BetCode': ''.join(choice(string.ascii_lowercase) for i in range(8)),
+                                                                        'd': {"BetHeadDetail": {"Coef": events[0].oc_rate,
+                                                                                                "PosWin": amount * float(events[0].oc_rate)
+                                                                                                }
+                                                                              }
+                                                                        },
+                                            bet_type=bet_type, amount=amount)
             if not new_model_bet:
                 LOG.error(f'error in save bet')
                 return {"errors": f"Ошибка при создании ставки", 'success': False}
