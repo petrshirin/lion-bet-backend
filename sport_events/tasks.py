@@ -106,7 +106,17 @@ def close_results_for_admin_matches():
                     user_bet.user.customeraccount.save()
 
 
-
+@app.task
+def update_type_for_user_bets():
+    user_bets = UserBet.objects.filter(is_went=None).all()
+    for user_bet in user_bets:
+        event = user_bet.events.first()
+        if event:
+            match = event.match_set.objects.first()
+            if match:
+                if match.request_type == 'live':
+                    user_bet.bet_type = 'live'
+                    user_bet.save()
 
 
 
