@@ -120,9 +120,9 @@ class Match(models.Model):
     def create_game_num_game_id_and_uniq(self):
         last_obj = Match.objects.filter(admin_created=True).last()
         if last_obj:
-            self.game_id = last_obj.game_id - 1
-            self.game_num = last_obj.game_num - 1
-            self.uniq = str(int(last_obj.uniq) - 1)
+            self.game_id = last_obj.game_id - 1 if last_obj.game_id else -1
+            self.game_num = last_obj.game_num - 1 if last_obj.game_num else -1
+            self.uniq = str(int(last_obj.uniq) - 1) if last_obj.uniq else -1
         else:
             self.game_id = -1
             self.game_num = -1
