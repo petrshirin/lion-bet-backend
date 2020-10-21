@@ -254,7 +254,7 @@ BET_API_SECRET_KEY = os.environ.get('BET_API_SECRET_KEY')
 
 # go bet API
 MAKE_BET_API_URL = os.environ.get('MAKE_BET_API_URL')
-REMOTE_HOST = "http://api.royal-lion.bet"
+REMOTE_HOST = "https://api.royal-lion.bet"
 MAKE_BET_PARTNER_ID = os.environ.get('MAKE_BET_PARTNER_ID')
 GO_BET_EMAIL = "example@google.com"
 GO_BET_PASSWORD = "1233"
