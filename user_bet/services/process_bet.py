@@ -6,16 +6,18 @@ from user_bet.go_bet_api_wrapper import GoBetWrapper
 import logging
 from sport_events.models import MatchEvent
 
+LOG = logging.getLogger(__name__)
+
 
 def process_bet_status(request: Request) -> bool:
     bets = request.data.get('Heads')
     if not bets:
-        print('qqq')
+        LOG.error('qqq')
         return False
     for bet in bets:
         user_bet = UserBet.objects.filter(bet_code=bet['KeyHead']['BarCode'], is_went=None).first()
         if not user_bet:
-            print('www')
+            LOG.error('www')
             return False
         status = bet.get('Status')
         exit_code = bet.get('ExtStatus')
@@ -39,7 +41,7 @@ def process_bet_status(request: Request) -> bool:
             user_bet.user.customeraccount.save()
             return True
         else:
-            print('rrr')
+            LOG.error('rrr')
             return False
 
 
