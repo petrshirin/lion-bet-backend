@@ -10,7 +10,7 @@ from django.db.utils import IntegrityError
 
 BASE_PATH = settings.BET_API_HOST
 API_SECRET_KEY = settings.BET_API_SECRET_KEY
-tz = timezone(timedelta(hours=0), name=settings.TIME_ZONE)
+tz = timezone(timedelta(hours=3), name=settings.TIME_ZONE)
 
 LOG = logging.getLogger(__name__)
 
@@ -325,7 +325,7 @@ class MatchWrapper(BetApiWrapper):
                                                              sport=sport,
                                                              tournament=tor,
                                                              name=f"{match.get('opp_1_name')} - {match.get('opp_2_name')}",
-                                                             game_start=datetime.fromtimestamp(match.get('game_start'), tz=tz),
+                                                             game_start=datetime.fromtimestamp(match.get('game_start')),
                                                              opp_1_name=match.get('opp_1_name'),
                                                              opp_2_name=match.get('opp_2_name'),
                                                              opp_1_id=match.get('opp_1_id'),
@@ -370,7 +370,7 @@ class MatchWrapper(BetApiWrapper):
                         old_match.score_period = match.get('score_period')
                         old_match.period_name = match.get('period_name')
                         old_match.request_type = self.request_type
-                        old_match.game_start = datetime.fromtimestamp(match.get('game_start'), tz=tz)
+                        old_match.game_start = datetime.fromtimestamp(match.get('game_start'))
                         old_match.ended = bool(match.get('finale'))
                         old_match.save()
                         for event in match.get('game_oc_list'):
