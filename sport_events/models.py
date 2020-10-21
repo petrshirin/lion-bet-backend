@@ -37,7 +37,7 @@ class Country(models.Model):
 
 
 class Tournament(models.Model):
-    api_id = models.IntegerField(verbose_name=u'Api Id', blank=True)
+    api_id = models.IntegerField(verbose_name=u'Api Id', blank=True, null=True)
     name = models.CharField(max_length=255, verbose_name=u'Название')
     name_en = models.CharField(max_length=255, verbose_name=u'Название на английском')
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name='t_sport', verbose_name=u'Спорт')
