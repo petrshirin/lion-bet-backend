@@ -56,7 +56,10 @@ class Tournament(models.Model):
     def create_api_id(self):
         last_obj = Tournament.objects.filter(admin_created=True).last()
         if last_obj:
-            self.api_id = last_obj.api_id - 1
+            if last_obj.api_id:
+                self.api_id = -1
+            else:
+                last_obj.api_id = -1
         else:
             self.api_id = -1
 
