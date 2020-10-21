@@ -16,7 +16,7 @@ class UserBetSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = UserBet
-        fields = ('id', 'bet_type', 'bet_code', "win_coefficient", "user_bet", "user_win", "is_went", "date_created", 'events')
+        fields = ('id', 'bet_type', 'bet_code', "win_coefficient", "user_bet", "user_win", "is_went", 'returned', "date_created", 'events')
 
     events = MatchEventWithMatchSerializer(many=True)
 
