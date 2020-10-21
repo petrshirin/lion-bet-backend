@@ -112,7 +112,7 @@ def update_type_for_user_bets():
     for user_bet in user_bets:
         event = user_bet.events.first()
         if event:
-            match = event.match_set.objects.first()
+            match = event.match_set.first()
             if match:
                 if match.request_type == 'live':
                     user_bet.bet_type = 'live'
