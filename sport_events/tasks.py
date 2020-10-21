@@ -64,6 +64,7 @@ def close_matches():
 @app.task
 def close_results_for_admin_matches():
     matches = Match.objects.filter(deleted=False, ended=False, admin_created=True, game_start__lte=now()).all()
+    print(matches)
     for match in matches:
         result = MatchAdminResult.objects.filter(match=match, date_closed__lte=now()).first()
         if not result:
