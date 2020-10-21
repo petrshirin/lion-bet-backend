@@ -13,9 +13,9 @@ class UserMoneyRequest(models.Model):
     amount = models.DecimalField(decimal_places=2, max_digits=10, verbose_name=u'Сумма')
     date_created = models.DateTimeField(default=now, verbose_name=u'Дата создания')
     accepted = models.BooleanField(default=None, null=True, verbose_name=u'Одобрена')
-    build = models.CharField(max_length=32, default=None, null=True, verbose_name=u'Код для пополнения')
-    method = models.CharField(max_length=50, default='input_qiwi', null=True)
-    account_number = models.CharField(max_length=50, default=None, null=True)
+    build = models.CharField(max_length=32, default=None, null=True, verbose_name=u'Код для пополнения', blank=True)
+    method = models.CharField(max_length=50, default='input_qiwi', null=True, blank=True)
+    account_number = models.CharField(max_length=50, default=None, null=True, blank=True)
 
     def __str__(self):
         return f'{self.request_type} {self.amount}'
