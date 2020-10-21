@@ -256,8 +256,8 @@ BET_API_SECRET_KEY = os.environ.get('BET_API_SECRET_KEY')
 MAKE_BET_API_URL = os.environ.get('MAKE_BET_API_URL')
 REMOTE_HOST = "https://api.royal-lion.bet"
 MAKE_BET_PARTNER_ID = os.environ.get('MAKE_BET_PARTNER_ID')
-GO_BET_EMAIL = "example@google.com"
-GO_BET_PASSWORD = "1233"
+GO_BET_EMAIL = os.environ.get('GO_BET_EMAIL')  # "example@google.com"
+GO_BET_PASSWORD = os.environ.get('GO_BET_PASSWORD')  # "1233"
 
 # if DEBUG and not SERVER:
 #    STATICFILES_DIRS = (
