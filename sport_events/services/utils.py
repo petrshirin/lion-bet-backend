@@ -54,14 +54,14 @@ def sort_event(event: dict) -> int:
     return EVENTS_TO_INT[event['short_name'].split(' ')[0]]
 
 
-def generate_page_of_tournaments(page: int, query_t: Q, query_m: Q) -> Tuple[List, int]:
+def generate_page_of_tournaments(page: int, query_t: Q, query_m: Q, request_type: str = 'line') -> Tuple[List, int]:
     tournaments = Tournament.objects.filter(query_t).all()
     low_line = page * 5
     data = []
 
     count_tournaments = 0
 
-    tournaments = delete_void_tournaments(tournaments, 'line')
+    tournaments = delete_void_tournaments(tournaments, request_type=request_type)
 
     for tournament in tournaments[low_line:]:
         if count_tournaments >= 5:

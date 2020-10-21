@@ -482,28 +482,29 @@ class CurrentMatchWrapper(BetApiWrapper):
         else:
             return None
 
-    def close_current_match(self, match: Match) -> None:
+    def close_current_match(self, match: Match) -> bool:
         resp = self._do_request()
         if resp:
             if resp['body'] == 'Error in you package!' or resp['body'] == 'Your package life has expired!':
                 LOG.error(f"{resp['body']} {datetime.utcnow()}")
-                return
+                return False
             if isinstance(resp['body'], str):
                 try:
                     match.ended = True
                     match.save()
-                    return
+                    return False
                 except AttributeError:
                     LOG.error(f"{self.uniq, self.game_id}")
-                    return
+                    return False
 
             if resp['body'] == [] or resp['body'].get('finale', False) is True:
                 try:
                     match.ended = True
                     match.save()
-                    return
+                    LOG.error('match closed')
+                    return True
                 except AttributeError:
                     LOG.error(f"{self.uniq, self.game_id}")
-                    return
+                    return False
 
 

@@ -59,4 +59,4 @@ def get_list_of_tournaments_with_matches_live(sport_id: int = 0, page: int = 0) 
 
     live_query_m = Q(request_type='live', deleted=False, ended=False)
 
-    return generate_page_of_tournaments(page, live_query_t, live_query_m)
+    return generate_page_of_tournaments(page, live_query_t, live_query_m, 'live')
