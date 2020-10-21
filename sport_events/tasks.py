@@ -71,7 +71,7 @@ def close_results_for_admin_matches():
         match.ended = True
         match.save()
         for event in match.events.all():
-            user_bets = UserBet.objects.filter(events__in=event).all()
+            user_bets = UserBet.objects.filter(events__exact=event).all()
             result = MatchAdminResult.objects.filter(match=match).first()
             for user_bet in user_bets:
                 if len(user_bet.events.all()) > 1:
