@@ -480,8 +480,7 @@ class CurrentMatchWrapper(BetApiWrapper):
 
         for event_list in response['body']['game_oc_list']:
             # удалить если будут все события добавляться
-            if 'Точный счет (' in event_list['group_name']:
-                print('find group')
+            if 'Точный счёт (' in event_list['group_name'] or 'Точный счёт' == event_list['group_name']:
                 for event in event_list['oc_list']:
 
                     if isinstance(event['oc_name'], str):
@@ -492,10 +491,8 @@ class CurrentMatchWrapper(BetApiWrapper):
                     short_name = generate_short_name(event['oc_group_name'],
                                                      oc_name,
                                                      match)
-                    print(f'short_name: {short_name}')
                     old_event = match.events.filter(oc_name=oc_name).first()
                     if old_event:
-                        print(f'event already')
                         old_event.last_changed = 0 if old_event.oc_rate == event['oc_rate'] else 1 if old_event.oc_rate < event['oc_rate'] else -1
                         old_event.oc_rate = event['oc_rate']
                         old_event.oc_pointer = event['oc_pointer']
@@ -506,7 +503,6 @@ class CurrentMatchWrapper(BetApiWrapper):
                                                                 oc_pointer=event['oc_pointer'],
                                                                 short_name=short_name,
                                                                 last_changed=0)
-                        print('created ', match_event)
                         match.events.add(match_event)
                         match.save()
                 break
@@ -564,6 +560,8 @@ def generate_short_name(oc_group: str, oc_name: str, match: Match) -> Union[str,
             return f'Нет'
         else:
             return None
+    elif 'точный счёт' in oc_group.lower():
+        return oc_name.split(' ')[-1].replace('-', ':')
     elif 'точный счет' in oc_group.lower():
         return oc_name.split(' ')[-1].replace('-', ':')
     else:
