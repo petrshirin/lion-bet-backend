@@ -128,8 +128,16 @@ def update_type_for_user_bets():
 
 
 @app.task
-def update_additional_events_to_matches():
+def update_additional_events_to_matches_live():
     matches = Match.objects.filter(request_type='live', deleted=False, ended=False).all()
+    for match in matches:
+        current_match_api = CurrentMatchWrapper(request_type=match.request_type, game_id=match.game_num, uniq=match.uniq)
+        current_match_api.update_addition_events_matches(match)
+
+
+@app.task
+def update_additional_events_to_matches_line():
+    matches = Match.objects.filter(request_type='line', deleted=False, ended=False).all()
     for match in matches:
         current_match_api = CurrentMatchWrapper(request_type=match.request_type, game_id=match.game_num, uniq=match.uniq)
         current_match_api.update_addition_events_matches(match)
