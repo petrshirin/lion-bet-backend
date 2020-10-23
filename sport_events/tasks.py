@@ -70,11 +70,11 @@ def close_results_for_admin_matches():
         if not result:
             continue
         match.ended = True
+        match.score_full = result.total_score
         match.save()
         for event in match.events.all():
             user_bets = UserBet.objects.filter(events__exact=event).all()
             print(user_bets)
-            result = MatchAdminResult.objects.filter(match=match).first()
             for user_bet in user_bets:
                 if len(user_bet.events.all()) > 1:
                     pass
@@ -93,9 +93,17 @@ def close_results_for_admin_matches():
                         else:
                             user_bet.is_went = False
                             user_bet.user.customeraccount.current_balance -= user_bet.user_bet
-                    else:
+                    elif user_event.oc_group_name.lower() == 'тотал':
                         user_event = user_bet.events.first()
                         if result.total in user_event.oc_name:
+                            user_bet.user.customeraccount.current_balance += user_bet.user_win
+                            user_bet.is_went = True
+                        else:
+                            user_bet.is_went = False
+                            user_bet.user.customeraccount.current_balance -= user_bet.user_win
+                    else:
+                        user_event = user_bet.events.first()
+                        if result.total_score == user_event.short_name:
                             user_bet.user.customeraccount.current_balance += user_bet.user_win
                             user_bet.is_went = True
                         else:
@@ -119,8 +127,12 @@ def update_type_for_user_bets():
                     user_bet.save()
 
 
-
-
+@app.task
+def update_additional_events_to_matches():
+    matches = Match.objects.filter(request_type='live', deleted=False, ended=False).all()
+    for match in matches:
+        current_match_api = CurrentMatchWrapper(request_type=match.request_type, game_id=match.game_num, uniq=match.uniq)
+        current_match_api.update_addition_events_matches(match)
 
 
 

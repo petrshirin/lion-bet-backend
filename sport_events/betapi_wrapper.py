@@ -50,6 +50,13 @@ class BetApiWrapper(object):
         """
         pass
 
+    @staticmethod
+    def check_response_for_active_token(resp: Dict) -> bool:
+        if resp['body'] == 'Error in you package!' or resp['body'] == 'Your package life has expired!':
+            LOG.error(f"{resp['body']} {datetime.utcnow()}")
+            return False
+        return True
+
 
 class SportWrapper(BetApiWrapper):
 
@@ -63,7 +70,10 @@ class SportWrapper(BetApiWrapper):
         """
         response = requests.get(f'{self.url}/sports/{self.request_type}/{self.lang}', headers=self.headers)
         if response.ok:
-            return response.json()
+            json_resp = response.json()
+            if self.check_response_for_active_token(json_resp):
+                return json_resp
+            return None
         else:
             return None
 
@@ -113,7 +123,10 @@ class CountryWrapper(BetApiWrapper):
         """
         response = requests.get(f'{self.url}/countries/{self.sport_id}/{self.request_type}/{self.lang}', headers=self.headers)
         if response.ok:
-            return response.json()
+            json_resp = response.json()
+            if self.check_response_for_active_token(json_resp):
+                return json_resp
+            return None
         else:
             return None
 
@@ -180,7 +193,10 @@ class TournamentWrapper(BetApiWrapper):
         """
         response = requests.get(f'{self.url}/tournaments/{self.sport_id}/{self.country_id}/{self.request_type}/{self.lang}', headers=self.headers)
         if response.ok:
-            return response.json()
+            json_resp = response.json()
+            if self.check_response_for_active_token(json_resp):
+                return json_resp
+            return None
         else:
             return None
 
@@ -213,7 +229,6 @@ class TournamentWrapper(BetApiWrapper):
         items = self._do_request()
         if items:
             for tournament in items['body']:
-
                 tournament_model = Tournament.objects.filter(api_id=tournament.get('id')).first()
                 try:
                     sport = Sport.objects.get(api_id=tournament.get('sport_id'))
@@ -270,7 +285,10 @@ class MatchWrapper(BetApiWrapper):
         else:
             response = requests.get(f'{self.url}/events/{sport_id}/{self.country_id}/sub/{self.count}/{self.request_type}/{self.lang}', headers=self.headers)
         if response.ok:
-            return response.json()
+            json_resp = response.json()
+            if self.check_response_for_active_token(json_resp):
+                return json_resp
+            return None
         else:
             return None
 
@@ -307,9 +325,10 @@ class MatchWrapper(BetApiWrapper):
         items = []
         for sport_from_db in all_sports_from_db:
             tmp_items = self._do_request(sport_from_db.api_id)
-            if isinstance(tmp_items['body'], str):
-                LOG.error(f"{tmp_items['body']} {datetime.utcnow()}")
+
+            if tmp_items is None:
                 return
+
             items += tmp_items['body']
         if items:
             for tournament in items:
@@ -349,9 +368,9 @@ class MatchWrapper(BetApiWrapper):
 
                         for event in match.get('game_oc_list'):
 
-                            short_name = self.generate_short_name(event['oc_group_name'],
-                                                                  event['oc_name'],
-                                                                  new_match)
+                            short_name = generate_short_name(event['oc_group_name'],
+                                                             event['oc_name'],
+                                                             new_match)
 
                             if short_name:
                                 new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
@@ -385,9 +404,9 @@ class MatchWrapper(BetApiWrapper):
                                     ev.save()
 
                             if not is_have:
-                                short_name = self.generate_short_name(event['oc_group_name'],
-                                                                      event['oc_name'],
-                                                                      old_match)
+                                short_name = generate_short_name(event['oc_group_name'],
+                                                                 event['oc_name'],
+                                                                 old_match)
 
                                 if short_name:
                                     new_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
@@ -397,63 +416,6 @@ class MatchWrapper(BetApiWrapper):
                                                                           short_name=short_name,
                                                                           last_changed=0)
                                     old_match.events.add(new_event)
-
-
-    @staticmethod
-    def generate_short_name(oc_group: str, oc_name: str, match: Match) -> Union[str, None]:
-        if oc_group == '1x2':
-            if match.opp_1_name == oc_name:
-                return 'П1'
-            elif match.opp_2_name == oc_name:
-                return 'П2'
-            else:
-                return 'X'
-        elif oc_group.lower() == 'тотал':
-            split_line = oc_name.split(' ')
-            return f'Т{split_line[2]} {split_line[1]}'
-
-        elif oc_group.lower() == 'индивидуальный тотал 1-го':
-            split_line = oc_name.split(' ')
-            if 'меньше' in oc_name.lower():
-                return f'ИТМ1 {split_line[-1]}'
-            elif 'больше' in oc_name.lower():
-                return f'ИТБ1 {split_line[-1]}'
-            else:
-                return None
-        elif oc_group.lower() == 'индивидуальный тотал 2-го':
-            split_line = oc_name.split(' ')
-            if 'меньше' in oc_name.lower():
-                return f'ИТМ2 {split_line[-1]}'
-            elif 'больше' in oc_name.lower():
-                return f'ИТБ2 {split_line[-1]}'
-            else:
-                return None
-        elif oc_group.lower() == 'фора':
-            split_line = oc_name.split(' ')
-            if match.opp_1_name in oc_name:
-                return f'Ф {split_line[-1]}'
-            elif match.opp_2_name in oc_name:
-                return f'Ф {split_line[-1]}'
-            else:
-                return None
-        elif oc_group.lower() == 'двойной шанс':
-            if match.opp_1_name in oc_name and match.opp_2_name in oc_name:
-                return f'12'
-            elif match.opp_1_name in oc_name:
-                return f'1X'
-            elif match.opp_2_name in oc_name:
-                return f'2X'
-            else:
-                return None
-        elif oc_group.lower() == 'обе забьют':
-            if 'Да' in oc_name:
-                return f'Да'
-            elif 'Нет' in oc_name:
-                return f'Нет'
-            else:
-                return None
-        else:
-            return None
 
 
 class CurrentMatchWrapper(BetApiWrapper):
@@ -483,11 +445,9 @@ class CurrentMatchWrapper(BetApiWrapper):
             return None
 
     def close_current_match(self, match: Match) -> bool:
+
         resp = self._do_request()
         if resp:
-            if resp['body'] == 'Error in you package!' or resp['body'] == 'Your package life has expired!':
-                LOG.error(f"{resp['body']} {datetime.utcnow()}")
-                return False
             if isinstance(resp['body'], str):
                 try:
                     match.ended = True
@@ -507,4 +467,100 @@ class CurrentMatchWrapper(BetApiWrapper):
                     LOG.error(f"{self.uniq, self.game_id}")
                     return False
 
+    def update_addition_events_matches(self, match: Match):
+        """
+        update total score events
+        :param match:
+        :return:
+        """
+        response = self._do_request()
 
+        if self.close_current_match(match):
+            return
+
+        for event_list in response['body']['game_oc_list']:
+            # удалить если будут все события добавляться
+            if 'Точный счет (' in event_list['group_name']:
+                for event in event_list['oc_list']:
+
+                    if isinstance(event['oc_name'], str):
+                        oc_name = event['oc_name'].split(' ')[-1].replace('-', ':')
+                    else:
+                        oc_name = event['oc_name']
+
+                    short_name = generate_short_name(event['oc_group_name'],
+                                                     oc_name,
+                                                     match)
+                    old_event = match.events.filter(oc_name=oc_name).first()
+                    if old_event:
+                        old_event.last_changed = 0 if old_event.oc_rate == event['oc_rate'] else 1 if old_event.oc_rate < event['oc_rate'] else -1
+                        old_event.oc_rate = event['oc_rate']
+                        old_event.oc_pointer = event['oc_pointer']
+                    else:
+                        match_event = MatchEvent.objects.create(oc_group_name=event['oc_group_name'],
+                                                                oc_name=oc_name,
+                                                                oc_rate=event['oc_rate'],
+                                                                oc_pointer=event['oc_pointer'],
+                                                                short_name=short_name,
+                                                                last_changed=0)
+                        match.events.add(match_event)
+                        match.save()
+                break
+
+
+def generate_short_name(oc_group: str, oc_name: str, match: Match) -> Union[str, None]:
+    if oc_group == '1x2':
+        if match.opp_1_name == oc_name:
+            return 'П1'
+        elif match.opp_2_name == oc_name:
+            return 'П2'
+        else:
+            return 'X'
+    elif oc_group.lower() == 'тотал':
+        split_line = oc_name.split(' ')
+        return f'Т{split_line[2]} {split_line[1]}'
+
+    elif oc_group.lower() == 'индивидуальный тотал 1-го':
+        split_line = oc_name.split(' ')
+        if 'меньше' in oc_name.lower():
+            return f'ИТМ1 {split_line[-1]}'
+        elif 'больше' in oc_name.lower():
+            return f'ИТБ1 {split_line[-1]}'
+        else:
+            return None
+    elif oc_group.lower() == 'индивидуальный тотал 2-го':
+        split_line = oc_name.split(' ')
+        if 'меньше' in oc_name.lower():
+            return f'ИТМ2 {split_line[-1]}'
+        elif 'больше' in oc_name.lower():
+            return f'ИТБ2 {split_line[-1]}'
+        else:
+            return None
+    elif oc_group.lower() == 'фора':
+        split_line = oc_name.split(' ')
+        if match.opp_1_name in oc_name:
+            return f'Ф {split_line[-1]}'
+        elif match.opp_2_name in oc_name:
+            return f'Ф {split_line[-1]}'
+        else:
+            return None
+    elif oc_group.lower() == 'двойной шанс':
+        if match.opp_1_name in oc_name and match.opp_2_name in oc_name:
+            return f'12'
+        elif match.opp_1_name in oc_name:
+            return f'1X'
+        elif match.opp_2_name in oc_name:
+            return f'2X'
+        else:
+            return None
+    elif oc_group.lower() == 'обе забьют':
+        if 'Да' in oc_name:
+            return f'Да'
+        elif 'Нет' in oc_name:
+            return f'Нет'
+        else:
+            return None
+    elif 'точный счет' in oc_group.lower():
+        return oc_name.split(' ')[-1].replace('-', ':')
+    else:
+        return None
