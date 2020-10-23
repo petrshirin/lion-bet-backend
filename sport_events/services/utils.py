@@ -23,6 +23,7 @@ EVENTS_TO_INT = {
     "Нет": 13,
     "Да": 14,
     "Ф": 15,
+    "*": 100,
 }
 
 
@@ -50,8 +51,7 @@ def split_events(events: List) -> Tuple[list, list]:
 
 
 def sort_event(event: dict) -> int:
-    print(event['short_name'].split(' '))
-    return EVENTS_TO_INT[event['short_name'].split(' ')[0]]
+    return EVENTS_TO_INT.get(event['short_name'].split(' ')[0], '*')
 
 
 def generate_page_of_tournaments(page: int, query_t: Q, query_m: Q, request_type: str = 'line') -> Tuple[List, int]:
