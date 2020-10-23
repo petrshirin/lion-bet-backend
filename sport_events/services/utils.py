@@ -51,7 +51,7 @@ def split_events(events: List) -> Tuple[list, list]:
 
 
 def sort_event(event: dict) -> int:
-    return EVENTS_TO_INT.get(event['short_name'].split(' ')[0], '*')
+    return EVENTS_TO_INT.get(event['short_name'].split(' ')[0], EVENTS_TO_INT["*"])
 
 
 def generate_page_of_tournaments(page: int, query_t: Q, query_m: Q, request_type: str = 'line') -> Tuple[List, int]:
