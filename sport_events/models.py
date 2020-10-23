@@ -133,7 +133,7 @@ class MatchAdminResult(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     winner = models.CharField(choices=[('П1', 'П1'), ('П2', 'П2'), ('X', 'X')],
                               max_length=2, verbose_name=u'Победитель')
-    total = models.CharField(choices=[('Б', 'Б'), ('М', 'М')], max_length=1)
+    total = models.CharField(choices=[('Б', 'Б'), ('М', 'М')], max_length=1, blank=True, default=None, null=True)
     total_score = models.CharField(max_length=10, verbose_name=u'Точный счет')
     date_closed = models.DateTimeField(default=None, null=True)
 
