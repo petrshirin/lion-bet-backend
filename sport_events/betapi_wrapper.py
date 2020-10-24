@@ -478,7 +478,10 @@ class CurrentMatchWrapper(BetApiWrapper):
         if self.close_current_match(match):
             return
 
-        print('find match', match.sport)
+        if not match:
+            LOG.error(f"{self.game_id} {self.request_type}")
+            return
+
         if not response or not response['body']:
             LOG.error(response)
             return
