@@ -23,7 +23,8 @@ class QiwiWrapper(object):
         data = {
             "publicKey": self.public_key,
             "build": self.build,
-            "amount": amount
+            "amount": amount,
+            "comment": self.build
         }
         return self.url + urllib.parse.urlencode(data)
 
