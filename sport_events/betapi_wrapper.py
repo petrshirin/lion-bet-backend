@@ -478,9 +478,14 @@ class CurrentMatchWrapper(BetApiWrapper):
         if self.close_current_match(match):
             return
 
+        print('find match', match.sport)
+        if not response or not response['body']:
+            LOG.error(response)
+            return
         for event_list in response['body']['game_oc_list']:
-            # удалить если будут все события добавляться
+            # удалить if если будут все события добавляться
             if 'Точный счёт (' in event_list['group_name'] or 'Точный счёт' == event_list['group_name']:
+                print('find group')
                 for event in event_list['oc_list']:
 
                     if isinstance(event['oc_name'], str):
@@ -493,6 +498,7 @@ class CurrentMatchWrapper(BetApiWrapper):
                                                      match)
                     old_event = match.events.filter(oc_name=oc_name).first()
                     if old_event:
+                        print(f'event already')
                         old_event.last_changed = 0 if old_event.oc_rate == event['oc_rate'] else 1 if old_event.oc_rate < event['oc_rate'] else -1
                         old_event.oc_rate = event['oc_rate']
                         old_event.oc_pointer = event['oc_pointer']
@@ -503,6 +509,7 @@ class CurrentMatchWrapper(BetApiWrapper):
                                                                 oc_pointer=event['oc_pointer'],
                                                                 short_name=short_name,
                                                                 last_changed=0)
+                        print('created ', match_event)
                         match.events.add(match_event)
                         match.save()
                 break
