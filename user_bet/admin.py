@@ -10,7 +10,7 @@ from django.utils.html import format_html
 class UserBetAdmin(admin.ModelAdmin):
     list_display = ('id', 'view_client', 'bet_type', 'user_bet', 'is_went', 'date_created', 'deleted')
     list_filter = ('user__client', 'bet_type', 'is_went', 'date_created', 'deleted')
-    filter_horizontal = ('sport_events',)
+    filter_horizontal = ('events',)
 
     def view_client(self, obj: UserBet):
         url = reverse(f"admin:users_client_change", args=[obj.user.client.id])
