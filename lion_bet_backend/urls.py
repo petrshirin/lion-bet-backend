@@ -26,4 +26,5 @@ urlpatterns = [
     path('bet/', include('user_bet.urls'), name='user_bet'),
     path('api/bet/result', process_bet_view),
     path('admin_tools/', include('admin_tools.urls')),
+    path('ajax_select/', include('ajax_select.urls')),
 ]
