@@ -457,7 +457,7 @@ class CurrentMatchWrapper(BetApiWrapper):
                     LOG.error(f"{self.uniq, self.game_id}")
                     return False
 
-            if resp['body'] == [] or resp['body'].get('finale', False) is True:
+            if resp['body'] == [] or resp['body'].get('finale', False) is True or "завер" in resp['body'].get('finale', ""):
                 try:
                     match.ended = True
                     match.save()
@@ -492,6 +492,7 @@ class CurrentMatchWrapper(BetApiWrapper):
                 for event in event_list['oc_list']:
 
                     if isinstance(event['oc_name'], str):
+                        event['oc_name'].replace('()', '0')
                         oc_name = event['oc_name'].split(' ')[-1].replace('-', ':')
                     else:
                         oc_name = event['oc_name']
