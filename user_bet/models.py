@@ -25,6 +25,7 @@ class UserBet(models.Model):
     class Meta:
         verbose_name = 'Ставка пользователя'
         verbose_name_plural = 'Ставки пользователей'
+        ordering = ["-date_created"]
 
 
 

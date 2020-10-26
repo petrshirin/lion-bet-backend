@@ -119,7 +119,7 @@ class Match(models.Model):
     class Meta:
         verbose_name = 'Матч'
         verbose_name_plural = 'Матчи'
-        ordering = ['game_id']
+        ordering = ['-game_start']
 
     def create_game_num_game_id_and_uniq(self):
         last_obj = Match.objects.filter(admin_created=True).all()
