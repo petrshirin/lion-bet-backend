@@ -274,6 +274,7 @@ EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
 EMAIL_USE_TLS = True
 DEFAULT_EMAIL = "mail@lionbet.com"
+DEFAULT_FROM_EMAIL = "Royal-Lion BET <info@royal-lion.bet>"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_FILE_PATH = "./tmp/mails"
 
