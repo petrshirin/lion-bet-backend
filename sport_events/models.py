@@ -1,5 +1,7 @@
 from django.db import models
 from random import randint
+
+from django.db.models import Q
 from django.db.models.signals import post_save, post_init
 from django.dispatch import receiver
 
@@ -120,6 +122,9 @@ class Match(models.Model):
         verbose_name = 'Матч'
         verbose_name_plural = 'Матчи'
         ordering = ['-game_start']
+        constraints = [
+            models.UniqueConstraint(fields=['game_id'], condition=Q(ended=False), name='uniq_game_id')
+        ]
 
     def create_game_num_game_id_and_uniq(self):
         last_obj = Match.objects.filter(admin_created=True).all()
