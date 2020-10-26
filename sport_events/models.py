@@ -4,6 +4,8 @@ from random import randint
 from django.db.models import Q
 from django.db.models.signals import post_save, post_init
 from django.dispatch import receiver
+import string
+import random
 
 
 # Create your models here.
@@ -91,10 +93,14 @@ class MatchEvent(models.Model):
         self.oc_pointer = f"{self.match_set.first().game_id if self.match_set.first() else ''}|0|0|0"
 
 
+def create_random_str():
+    return "".join([random.choice(string.ascii_lowercase) for i in range(20)])
+
+
 class Match(models.Model):
     game_num = models.IntegerField(verbose_name=u'Номер игры', null=True, blank=True)
     game_id = models.IntegerField(verbose_name=u'Id', null=True, blank=True)
-    uniq = models.CharField(max_length=100, null=True, unique=True, blank=True)
+    uniq = models.CharField(max_length=100, null=True, unique=True, blank=True, default=create_random_str)
     name = models.CharField(max_length=255, verbose_name=u'Название', blank=True, null=True)
     name_en = models.CharField(max_length=255, verbose_name=u'Название на английском', blank=True, null=True)
     game_start = models.DateTimeField(verbose_name=u'Дата начала')
@@ -181,3 +187,9 @@ def create_admin_tournament(sender: Tournament, instance: Tournament, created: b
         if instance.admin_created:
             instance.create_api_id()
             instance.save()
+
+
+@receiver(post_init, sender=Match)
+def add_tmp_values(sender: Match, instance: Match, **kwargs):
+    if not instance.uniq:
+        instance.create_game_num_game_id_and_uniq()
