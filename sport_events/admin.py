@@ -8,8 +8,6 @@ from ajax_select import make_ajax_form
 
 # Register your models here.
 
-admin.site.register(MatchEvent)
-
 
 @admin.register(Sport)
 class SportAdmin(admin.ModelAdmin):
@@ -60,4 +58,12 @@ class ResultAdmin(admin.ModelAdmin):
     list_filter = ('winner', 'total', 'total_score')
     search_fields = ('match__name__startswith', 'sport__name__startswith')
     form = ResultAdminForm
+
+
+@admin.register(MatchEvent)
+class TournamentAdmin(admin.ModelAdmin):
+    list_display = ('oc_group_name', 'oc_name', 'oc_rate', 'short_name', 'admin_created')
+    list_filter = ('oc_group_name', 'admin_created')
+
+
 
