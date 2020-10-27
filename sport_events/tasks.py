@@ -69,6 +69,8 @@ def close_results_for_admin_matches():
         result = MatchAdminResult.objects.filter(match=match, date_closed__lte=now()).first()
         if not result:
             continue
+        if result.date_closed > now():
+            continue
         match.ended = True
         match.score_full = result.total_score
         match.save()
