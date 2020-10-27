@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 from envparse import env
+from kombu import Queue, Exchange
 
 env.read_envfile('.env')
 
@@ -246,6 +247,16 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_ACKS_LATE = True
 
+CELERY_QUEUES = (
+    Queue('default', Exchange('default'), routing_key='default'),
+    Queue('for_update_matches', Exchange('for_update_matches'), routing_key='for_update_matches'),
+)
+CELERY_ROUTES = {
+    'update_matches_live': {'queue': 'for_update_matches', 'routing_key': 'for_update_matches'},
+}
+
+
+
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -285,3 +296,4 @@ QIWI_PUBLIC_KEY = os.environ["QIWI_PUBLIC_KEY"]
 ADMIN_TOOLS_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'
 ADMIN_TOOLS_MENU = 'menu.CustomMenu'
 FRONT_HOST = 'http://royal-lion.bet'
+
