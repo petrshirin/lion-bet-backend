@@ -72,6 +72,24 @@ class GoBetWrapper(object):
             LOG.error(f"Register user error in json(): {str(err)}")
             return None
 
+    def get_current_bet(self, email, barcode):
+        data = {
+            "login": email,
+            "links": [barcode]
+        }
+
+        LOG.debug(data)
+        response = requests.post(f"{self.url}/loadbars/", json=data, cookies=self.cookies)
+        if response.ok:
+            try:
+                start_json = response.text.find('{')
+                return json.loads(response.text[start_json:])
+
+            except JSONDecodeError as err:
+                print(response.text)
+                LOG.error(f"Make bet error in json(): {str(err)}")
+                return None
+
     def make_bet(self, bets_list: List, amount: float, rate_mode: str = 'accept') -> Union[Dict, None]:
         """
         do request to go bet service and start to get updates in remote host
