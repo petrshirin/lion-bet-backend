@@ -93,14 +93,51 @@ class MatchEvent(models.Model):
         self.oc_pointer = f"{self.match_set.first().game_id if self.match_set.first() else ''}|0|0|0"
 
 
-def create_random_str():
-    return "".join([random.choice(string.ascii_lowercase) for i in range(20)])
+def create_default_uniq():
+    last_obj = Match.objects.filter(admin_created=True).order_by('pk').all()
+    if len(last_obj) >= 1:
+        last_obj = last_obj[len(last_obj) - 1]
+    else:
+        last_obj = None
+    if last_obj:
+        return str(int(last_obj.uniq) - 1) if last_obj.uniq else -1
+    else:
+        return str(-1)
+
+
+def create_random_uniq():
+    pass
+
+
+
+def create_default_game_id():
+    last_obj = Match.objects.filter(admin_created=True).order_by('pk').all()
+    if len(last_obj) >= 1:
+        last_obj = last_obj[len(last_obj) - 1]
+    else:
+        last_obj = None
+    if last_obj:
+        return last_obj.game_id - 1 if last_obj.game_id else -1
+    else:
+        return -1
+
+
+def create_default_game_num():
+    last_obj = Match.objects.filter(admin_created=True).order_by('pk').all()
+    if len(last_obj) >= 1:
+        last_obj = last_obj[len(last_obj) - 1]
+    else:
+        last_obj = None
+    if last_obj:
+        return last_obj.game_num - 1 if last_obj.game_num else -1
+    else:
+        return -1
 
 
 class Match(models.Model):
-    game_num = models.IntegerField(verbose_name=u'Номер игры', null=True, blank=True)
-    game_id = models.IntegerField(verbose_name=u'Id', null=True, blank=True)
-    uniq = models.CharField(max_length=100, null=True, unique=True, blank=True, default=create_random_str)
+    game_num = models.IntegerField(verbose_name=u'Номер игры', null=True, blank=True, default=create_default_game_num)
+    game_id = models.IntegerField(verbose_name=u'Id', null=True, blank=True, default=create_default_game_id)
+    uniq = models.CharField(max_length=100, null=True, unique=True, blank=True, default=create_default_uniq)
     name = models.CharField(max_length=255, verbose_name=u'Название', blank=True, null=True)
     name_en = models.CharField(max_length=255, verbose_name=u'Название на английском', blank=True, null=True)
     game_start = models.DateTimeField(verbose_name=u'Дата начала')
@@ -133,15 +170,16 @@ class Match(models.Model):
         ]
 
     def create_game_num_game_id_and_uniq(self):
-        last_obj = Match.objects.filter(admin_created=True).all()
+        last_obj = Match.objects.filter(admin_created=True).order_by('pk').all()
         if len(last_obj) >= 2:
-            last_obj = last_obj[len(last_obj) - 2]
+            last_obj = last_obj[len(last_obj) - 1]
         else:
             last_obj = None
         if last_obj:
+            print(last_obj.game_id)
             self.game_id = last_obj.game_id - 1 if last_obj.game_id else -1
             self.game_num = last_obj.game_num - 1 if last_obj.game_num else -1
-            self.uniq = str(int(last_obj.uniq) - 1) if last_obj.uniq else -1
+            self.uniq = str(int(last_obj.uniq) - 1) if last_obj.uniq else str(-1)
         else:
             self.game_id = -1
             self.game_num = -1
@@ -165,12 +203,12 @@ class MatchAdminResult(models.Model):
         ordering = ['match']
 
 
-@receiver(post_save, sender=Match)
-def create_admin_match(sender: Match, instance: Match, created: bool, **kwargs):
-    if created:
-        if instance.admin_created:
-            instance.create_game_num_game_id_and_uniq()
-            instance.save()
+#@receiver(post_save, sender=Match)
+#def create_admin_match(sender: Match, instance: Match, created: bool, **kwargs):
+#    if created:
+#        if instance.admin_created:
+#            instance.create_game_num_game_id_and_uniq()
+#            instance.save()
 
 
 @receiver(post_save, sender=MatchEvent)
@@ -188,8 +226,3 @@ def create_admin_tournament(sender: Tournament, instance: Tournament, created: b
             instance.create_api_id()
             instance.save()
 
-
-@receiver(post_init, sender=Match)
-def add_tmp_values(sender: Match, instance: Match, **kwargs):
-    if not instance.uniq:
-        instance.create_game_num_game_id_and_uniq()
