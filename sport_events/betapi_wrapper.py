@@ -457,7 +457,10 @@ class CurrentMatchWrapper(BetApiWrapper):
                     LOG.error(f"{self.uniq, self.game_id}")
                     return False
 
-            if resp['body'] == [] or resp['body'].get('finale', False) is True or "завер" in resp['body'].get('finale', ""):
+            if "завер" in str(resp['body'].get('finale', "")):
+                resp['body'] = []
+
+            if resp['body'] == [] or resp['body'].get('finale', False) is True:
                 try:
                     match.ended = True
                     match.save()
