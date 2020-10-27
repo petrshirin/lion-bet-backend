@@ -51,9 +51,9 @@ def change_user_balance(sender: UserMoneyRequest, instance: UserMoneyRequest, **
         customer_account = CustomerAccount.objects.filter(user=instance.user).first()
         if instance.request_type == 'input':
             amount_to_add = _double_first_pay(float(instance.amount), instance.user)
-            customer_account.current_balance += amount_to_add
+            customer_account.current_balance = float(customer_account.current_balance) + amount_to_add
         else:
-            customer_account.current_balance -= instance.amount
+            customer_account.current_balance = float(customer_account.current_balance) - float(instance.amount)
 
         customer_account.save()
 
