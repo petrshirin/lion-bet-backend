@@ -40,7 +40,7 @@ class AdminMatchForm(ModelForm):
 class MatchAdmin(admin.ModelAdmin):
     list_display = ('game_num', 'name', 'sport', 'tournament', 'game_start', 'admin_created', 'deleted')
     list_filter = ('sport', 'deleted', 'game_start', 'admin_created')
-    search_fields = ('opp_1_name__contains', 'opp_2_nam__contains', 'name__contains', 'game_num')
+    search_fields = ('opp_1_name__contains', 'opp_2_name__contains', 'name__contains', 'game_num')
     ordering = ['deleted', '-game_start']
     readonly_fields = ['game_num', 'game_id', 'uniq']
     form = AdminMatchForm
