@@ -59,7 +59,7 @@ class CustomerAccount(models.Model):
 class EmailTemplate(models.Model):
     subject = models.CharField(max_length=255, verbose_name=u'Тема')
     text = models.TextField(verbose_name=u'Текст')
-    from_email = models.EmailField(default=settings.DEFAULT_EMAIL, verbose_name=u'Отправитель')
+    from_email = models.CharField(default=settings.DEFAULT_EMAIL, verbose_name=u'Отправитель', max_length=100)
 
     class Meta:
         verbose_name = 'Шаблон для Email'
