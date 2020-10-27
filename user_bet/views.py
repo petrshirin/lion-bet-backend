@@ -47,4 +47,5 @@ def process_bet_view(request: Request) -> Response:
     is_processed = process_bet_status(request)
     if not is_processed:
         LOG.error(f"Error in process bet {request.data}")
+        return Response('fail', status=400)
     return Response('ok', status=200)
