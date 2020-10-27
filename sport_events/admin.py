@@ -56,8 +56,8 @@ class ResultAdminForm(ModelForm):
 
 @admin.register(MatchAdminResult)
 class ResultAdmin(admin.ModelAdmin):
-    list_display = ('match', 'winner', 'total')
-    list_filter = ('match', 'winner', 'total')
+    list_display = ('match', 'winner', 'total', 'total_score')
+    list_filter = ('winner', 'total', 'total_score')
     search_fields = ('match__name__startswith', 'sport__name__startswith')
     form = ResultAdminForm
 
