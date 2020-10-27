@@ -33,7 +33,7 @@ class AdminMatchForm(ModelForm):
         model = Match
         fields = "__all__"
 
-    events = AutoCompleteField('ajax_events', required=False, help_text="Press + and add new event")
+    events = AutoCompleteSelectMultipleField('ajax_events', required=False, help_text="Press + and add new event")
 
 
 @admin.register(Match)
