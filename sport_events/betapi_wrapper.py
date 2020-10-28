@@ -446,6 +446,9 @@ class CurrentMatchWrapper(BetApiWrapper):
 
     def close_current_match(self, match: Match) -> bool:
 
+        if match.admin_created:
+            return False
+
         resp = self._do_request()
         if resp:
             if isinstance(resp['body'], str):
