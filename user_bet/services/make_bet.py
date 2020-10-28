@@ -35,6 +35,9 @@ def make_bet(request: Request, bet_type: str) -> Dict:
     if events is None:
         return {'errors': "Неверный ID Ставки", 'success': False}
 
+    if not check_balance(request.user, amount):
+        return {"errors": "Недостаточно средств для совершения операции", 'success': False}
+
     if check_admin_bet(events):
         if len(events) == 1:
             new_model_bet = _save_bet_to_db(user=request.user, new_bet={'BetCode': ''.join(choice(string.ascii_lowercase) for i in range(8)),
@@ -53,13 +56,12 @@ def make_bet(request: Request, bet_type: str) -> Dict:
                 new_model_bet.delete()
                 LOG.error(f'error in save bet events')
                 return {"errors": f"Ошибка при создании ставки, Ошибка в ивентах", 'success': False}
+            request.user.customeraccount.current_balance = float(request.user.customeraccount.current_balance) - float(new_model_bet.user_bet)
+            request.user.customeraccount.save()
             bet_ser = UserBetSerializers(new_model_bet)
             return {"data": bet_ser.data, "success": True}
         else:
             return {"errors": f"Одна или несколько ставок недоступны, для экспресса", 'success': False}
-
-    if not check_balance(request.user, amount):
-        return {"errors": "Недостаточно средств для совершения операции", 'success': False}
 
     list_bets = _create_list_bets(events, bet_type)
 

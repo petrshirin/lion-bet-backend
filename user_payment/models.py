@@ -63,3 +63,4 @@ def _double_first_pay(amount: float, user: User):
         return amount * 2
     else:
         return amount
+
