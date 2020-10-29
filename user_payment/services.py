@@ -42,7 +42,7 @@ def make_output_request(request: Request) -> Dict:
         try:
             amount = float(request.data.get('amount'))
             if UserMoneyRequest.objects.filter(user=request.user, request_type='input', accepted=True).count() < 10:
-                return {"errors": "Недостаточное количество пополнений для вывода", "success": False}
+                return {"errors": "Недостаточное количество пополнений для вывода (должно быть 10 пополнений)", "success": False}
             if not check_balance(request.user, amount):
                 return {"errors": "Недостаточно средств для вывода", 'success': False}
             UserMoneyRequest.objects.create(user=request.user,
