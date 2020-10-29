@@ -386,15 +386,19 @@ class MatchWrapper(BetApiWrapper):
                         LOG.info(f'{new_match.game_num}, events: {new_match.events.count()}')
 
                     else:
-                        old_match.game_num = match.get('game_num')
-                        old_match.game_id = match.get('game_id')
-                        old_match.score_full = match.get('score_full')
-                        old_match.score_period = match.get('score_period')
-                        old_match.period_name = match.get('period_name')
-                        old_match.request_type = self.request_type
-                        old_match.game_start = datetime.fromtimestamp(match.get('game_start'))
-                        old_match.ended = bool(match.get('finale'))
-                        old_match.save()
+                        try:
+                            old_match.game_num = match.get('game_num')
+                            old_match.game_id = match.get('game_id')
+                            old_match.score_full = match.get('score_full')
+                            old_match.score_period = match.get('score_period')
+                            old_match.period_name = match.get('period_name')
+                            old_match.request_type = self.request_type
+                            old_match.game_start = datetime.fromtimestamp(match.get('game_start'))
+                            old_match.ended = bool(match.get('finale'))
+                            old_match.save()
+                        except IntegrityError:
+                            LOG.error(f"Not unique match {match.get('uniq')} {old_match}")
+                            continue
                         for event in match.get('game_oc_list'):
                             is_have = False
                             for ev in old_match.events.all():
