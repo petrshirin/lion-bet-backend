@@ -40,6 +40,10 @@ class Country(models.Model):
         verbose_name_plural = 'Страны'
 
 
+def create_random_str():
+    pass
+
+
 class Tournament(models.Model):
     api_id = models.IntegerField(verbose_name=u'Api Id', blank=True, null=True)
     name = models.CharField(max_length=255, verbose_name=u'Название')
