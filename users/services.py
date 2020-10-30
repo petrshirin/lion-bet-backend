@@ -151,6 +151,7 @@ def generate_token(user: User) -> Union[str, None]:
 
 
 def send_email_to_user(mail_type: int = 1, recipient_list: List[str] = None, email_info: str = None) -> bool:
+    return True
     try:
         template = EmailTemplate.objects.get(pk=mail_type)
     except EmailTemplate.DoesNotExist:
