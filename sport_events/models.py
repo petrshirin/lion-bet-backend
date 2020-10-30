@@ -60,7 +60,7 @@ class Tournament(models.Model):
     class Meta:
         verbose_name = 'Турнир'
         verbose_name_plural = 'Турниры'
-        ordering = ['admin_created']
+        ordering = ['-admin_created']
 
     def create_api_id(self):
         last_obj = Tournament.objects.filter(admin_created=True).all()
