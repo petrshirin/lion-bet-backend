@@ -15,22 +15,22 @@ def process_bet_status(request: Request) -> bool:
         LOG.error('error in bets')
         LOG.error(request.data)
         return False
+    result = True
     for bet in bets:
         user_bet = UserBet.objects.filter(bet_code=bet['KeyHead']['BarCode']).first()
         if not user_bet:
             LOG.error('error in find this bet')
             LOG.error(request.data)
-            return False
+            result = False
         status = bet.get('Status')
         exit_code = bet.get('ExtStatus')
-        print(status, exit_code)
+        LOG.error(status, exit_code)
         if status == 2 and exit_code == 0:
             user_bet.user.customeraccount.current_balance += user_bet.user_win
             user_bet.is_went = True
             user_bet.save()
             user_bet.user.customeraccount.save()
             LOG.error(request.data)
-            return True
         elif status == 4 and exit_code == 0:
             if user_bet.is_went:
                 user_bet.user.customeraccount.current_balance -= user_bet.user_win
@@ -38,7 +38,6 @@ def process_bet_status(request: Request) -> bool:
             user_bet.is_went = False
             user_bet.save()
             LOG.error(request.data)
-            return True
         elif status == 2 and exit_code == 1:
             user_bet.user.customeraccount.current_balance += user_bet.user_bet
             user_bet.is_went = False
@@ -46,11 +45,11 @@ def process_bet_status(request: Request) -> bool:
             user_bet.save()
             user_bet.user.customeraccount.save()
             LOG.error(request.data)
-            return True
         else:
             LOG.error('error in status bet')
             LOG.error(request.data)
-            return False
+            result = False
+    return result
 
 
 
