@@ -142,9 +142,6 @@ class GoBetWrapper(object):
         if response.ok:
             try:
                 result = response.json()
-                if result.get('errorCode'):
-                    LOG.error(data)
-                    return None
                 return result[0]
             except JSONDecodeError as err:
                 LOG.error(f"Make bet error in json(): {str(err)}")
