@@ -44,7 +44,7 @@ def get_all_user_bet_view(request: Request) -> Response:
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def process_bet_view(request: Request) -> Response:
-    is_processed = process_bet_status(request)
+    is_processed = process_bet_status(request.data)
     if not is_processed:
         LOG.error(f"Error in process bet {request.data}")
         return Response('fail', status=400)

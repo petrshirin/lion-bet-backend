@@ -8,6 +8,7 @@ import json
 MAKE_BET_PARTNER_ID = int(settings.MAKE_BET_PARTNER_ID)
 MAKE_BET_API_URL = settings.MAKE_BET_API_URL
 REMOTE_HOST = settings.REMOTE_HOST
+PARTNER_MAIL = settings.GO_BET_EMAIL
 
 LOG = logging.getLogger(__name__)
 
@@ -122,5 +123,29 @@ class GoBetWrapper(object):
                 return result
             except JSONDecodeError as err:
                 print(response.text)
+                LOG.error(f"Make bet error in json(): {str(err)}")
+                return None
+
+    def get_bet_status(self, bet_code: str) -> Union[Dict, None]:
+        """
+
+        :param bet_code:
+        :return:
+        """
+        data = {
+            'mails': [PARTNER_MAIL],
+            'links': [bet_code],
+            "mode": "mixed"
+        }
+        LOG.debug(data)
+        response = requests.post(f"{self.url}/loadbars/", json=data, cookies=self.cookies)
+        if response.ok:
+            try:
+                result = response.json()
+                if result.get('errorCode'):
+                    LOG.error(data)
+                    return None
+                return result[0]
+            except JSONDecodeError as err:
                 LOG.error(f"Make bet error in json(): {str(err)}")
                 return None
