@@ -23,6 +23,7 @@ def process_bet_status(data: dict) -> bool:
             LOG.error('error in find this bet')
             LOG.error(data)
             result = False
+            continue
         status = bet.get('Status')
         exit_code = bet.get('ExtStatus', 0)
         LOG.error(status, exit_code)
