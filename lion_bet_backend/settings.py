@@ -256,7 +256,6 @@ CELERY_ROUTES = {
 }
 
 
-
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -291,6 +290,7 @@ EMAIL_FILE_PATH = "./tmp/mails"
 
 # QIWI settings
 QIWI_PUBLIC_KEY = os.environ["QIWI_PUBLIC_KEY"]
+QIWI_SECRET_KEY = os.environ["QIWI_SECRET_KEY"]
 
 # Admin
 ADMIN_TOOLS_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'

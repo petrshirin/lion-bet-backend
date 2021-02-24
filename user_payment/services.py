@@ -74,3 +74,6 @@ def user_input_requests(user: User) -> Dict:
     user_requests_ser = UserMoneyRequestSerializer(user_requests, many=True)
     return {"data": user_requests_ser.data, "success": True}
 
+
+
+
