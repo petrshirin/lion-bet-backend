@@ -404,6 +404,8 @@ class MatchWrapper(BetApiWrapper):
                             for ev in old_match.events.all():
                                 is_have = True
                                 if ev.oc_name == event['oc_name']:
+                                    if isinstance(event['oc_rate'], str):
+                                        continue
                                     ev.last_changed = 0 if ev.oc_rate == event['oc_rate'] else 1 if ev.oc_rate < event['oc_rate'] else -1
                                     ev.oc_rate = event['oc_rate']
                                     ev.oc_pointer = event['oc_pointer']
