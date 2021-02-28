@@ -402,13 +402,18 @@ class MatchWrapper(BetApiWrapper):
                         for event in match.get('game_oc_list'):
                             is_have = False
                             if isinstance(event['oc_rate'], str):
+                                LOG.error(event)
                                 continue
                             for ev in old_match.events.all():
                                 is_have = True
                                 if ev.oc_name == event['oc_name']:
                                     if isinstance(event['oc_rate'], str):
                                         continue
-                                    ev.last_changed = 0 if ev.oc_rate == event['oc_rate'] else 1 if ev.oc_rate < event['oc_rate'] else -1
+                                    try:
+                                        ev.last_changed = 0 if float(ev.oc_rate) == event['oc_rate'] else 1 if float(ev.oc_rate) < float(event['oc_rate']) else -1
+                                    except TypeError:
+                                        LOG.error(event)
+                                        continue
                                     ev.oc_rate = event['oc_rate']
                                     ev.oc_pointer = event['oc_pointer']
 
