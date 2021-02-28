@@ -401,6 +401,8 @@ class MatchWrapper(BetApiWrapper):
                             continue
                         for event in match.get('game_oc_list'):
                             is_have = False
+                            if isinstance(event['oc_rate'], str):
+                                continue
                             for ev in old_match.events.all():
                                 is_have = True
                                 if ev.oc_name == event['oc_name']:
